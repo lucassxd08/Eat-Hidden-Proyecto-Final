@@ -20,6 +20,11 @@ negocio.
 
 Tema de la aplicacion: App de delivery para dark kitchens:
 Caracteristicas:
+- Roles:
+    - Administrador: gestiona todo el sistema
+    - Personal de cocina: ve y actualiza el estado de los pedidos
+    - Cliente: hace pedidos online
+    - Repartidor: gestiona las entregas
 - Administran su menu (platos, categorias, precio)
 - Reciben y gestionan pedidos
 - Manejan clientes
