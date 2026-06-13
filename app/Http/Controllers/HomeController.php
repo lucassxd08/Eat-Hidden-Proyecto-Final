@@ -2,26 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use App\Models\Dish;
+use App\Models\Restaurant;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        $categories = Category::where('active', true)->get();
-        $featuredDishes = Dish::where('available', true)->with('category')->take(6)->get();
-
-        return view('home', compact('categories', 'featuredDishes'));
+        $restaurants = Restaurant::where('active', true)->withCount('dishes')->take(6)->get();
+        return view('home', compact('restaurants'));
     }
 
     public function menu()
     {
-        $categories = Category::where('active', true)->with(['dishes' => function ($q) {
-            $q->where('available', true);
-        }])->get();
-
-        return view('menu', compact('categories'));
+        $restaurants = Restaurant::where('active', true)->withCount('dishes')->get();
+        return view('menu', compact('restaurants'));
     }
 
     public function about()

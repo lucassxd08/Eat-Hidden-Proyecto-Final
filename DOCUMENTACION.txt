@@ -1,0 +1,484 @@
+================================================================
+  EATHIDDEN — DOCUMENTACIÓN DEL PROYECTO
+  App de delivery para múltiples dark kitchens
+  Laravel 12 + Tailwind CSS + MySQL
+================================================================
+
+
+================================================================
+  1. BASE DE DATOS — MIGRACIONES
+================================================================
+
+Las migraciones definen la estructura de la base de datos.
+Se encuentran en: database/migrations/
+
+-----------------------------------------------------------------
+0001_01_01_000000_create_users_table.php
+-----------------------------------------------------------------
+Crea la tabla base de usuarios de Laravel (Breeze).
+Campos: id, name, email, password, timestamps.
+
+-----------------------------------------------------------------
+0002_add_role_to_users_table.php
+-----------------------------------------------------------------
+Agrega columnas adicionales a la tabla users.
+Campos agregados:
+  - role (enum): 'admin', 'kitchen', 'client', 'delivery'
+  - phone: teléfono del usuario
+  - address: dirección del usuario
+Relación con procesos: define el tipo de usuario y qué puede hacer
+en la app. El rol determina a qué rutas y vistas tiene acceso.
+
+-----------------------------------------------------------------
+0003_create_categories_table.php
+-----------------------------------------------------------------
+Crea la tabla de categorías de platos.
+Campos: id, name, description, active (si está habilitada), timestamps.
+Relación con procesos: las categorías agrupan los platos en el menú.
+Cuando el cliente ve el menú de un restaurante, los platos se muestran
+agrupados por categoría.
+
+-----------------------------------------------------------------
+0004_create_dishes_table.php
+-----------------------------------------------------------------
+Crea la tabla de platos.
+Campos: id, restaurant_id (FK→restaurants), category_id (FK→categories),
+        name, description, price, image, available, timestamps.
+Relación con procesos: cada plato pertenece a un restaurante y una
+categoría. El cliente elige platos de esta tabla al hacer un pedido.
+
+-----------------------------------------------------------------
+0005_create_orders_table.php
+-----------------------------------------------------------------
+Crea la tabla de pedidos.
+Campos: id, client_id (FK→users), delivery_id (FK→users, nullable),
+        status (enum: pending/confirmed/preparing/ready/delivering/delivered/cancelled),
+        total, delivery_address, notes, timestamps.
+Relación con procesos: es la tabla central del proceso de pedido.
+Registra quién pidió, quién entrega, en qué estado está y el total.
+
+-----------------------------------------------------------------
+0006_create_order_items_table.php
+-----------------------------------------------------------------
+Crea la tabla de ítems de cada pedido (el detalle).
+Campos: id, order_id (FK→orders), dish_id (FK→dishes),
+        quantity, unit_price, timestamps.
+Relación con procesos: cuando el cliente confirma su carrito, cada
+plato seleccionado se guarda como un registro en esta tabla,
+vinculado al pedido creado.
+
+-----------------------------------------------------------------
+0007_create_restaurants_table.php
+-----------------------------------------------------------------
+Crea la tabla de restaurantes (dark kitchens).
+Campos: id, name, description, logo, active, timestamps.
+Relación con procesos: el cliente primero elige un restaurante antes
+de ver el menú. El admin puede activar o desactivar restaurantes,
+lo que controla si aparecen en la lista pública.
+
+-----------------------------------------------------------------
+0008_add_restaurant_id_to_dishes_table.php
+-----------------------------------------------------------------
+Agrega la columna restaurant_id a la tabla dishes.
+Relaciona cada plato con su restaurante de origen.
+Relación con procesos: cuando el cliente entra al menú de un
+restaurante específico, la app filtra los platos por restaurant_id.
+
+
+================================================================
+  2. MODELOS — app/Models/
+================================================================
+
+Los modelos representan las tablas y permiten consultar/guardar
+datos usando Eloquent ORM (sin escribir SQL manual).
+
+-----------------------------------------------------------------
+User.php
+-----------------------------------------------------------------
+Representa a los usuarios del sistema.
+Métodos clave:
+  - isAdmin(), isKitchen(), isClient(), isDelivery()
+    → Usados en el navbar y middleware para mostrar u ocultar
+      secciones según el rol.
+  - orders(): relación con sus pedidos como cliente.
+  - deliveries(): relación con pedidos que entrega como repartidor.
+
+-----------------------------------------------------------------
+Restaurant.php
+-----------------------------------------------------------------
+Representa un restaurante (dark kitchen).
+Relaciones:
+  - dishes(): un restaurante tiene muchos platos.
+Uso en procesos: el admin crea/edita restaurantes. Los clientes
+ven la lista de restaurantes activos antes de hacer un pedido.
+
+-----------------------------------------------------------------
+Category.php
+-----------------------------------------------------------------
+Representa una categoría de platos (ej: Hamburguesas, Pizzas).
+Relaciones:
+  - dishes(): una categoría tiene muchos platos.
+Uso en procesos: en el menú del restaurante, los platos se agrupan
+por categoría para mostrarlos ordenados.
+
+-----------------------------------------------------------------
+Dish.php
+-----------------------------------------------------------------
+Representa un plato del menú.
+Relaciones:
+  - restaurant(): pertenece a un restaurante.
+  - category(): pertenece a una categoría.
+  - orderItems(): aparece en múltiples ítems de pedidos.
+Uso en procesos: el cliente ve los platos disponibles y los agrega
+al carrito. El precio del plato se copia al order_item como
+unit_price para conservar el precio histórico.
+
+-----------------------------------------------------------------
+Order.php
+-----------------------------------------------------------------
+Representa un pedido completo.
+Atributos especiales:
+  - $statuses: array con etiquetas en español para cada estado
+    (ej: 'pending' => 'Pendiente').
+  - status_label: muestra el estado en español en las vistas.
+Relaciones:
+  - client(): el usuario que hizo el pedido.
+  - deliveryPerson(): el repartidor asignado.
+  - items(): los platos del pedido (OrderItem).
+Uso en procesos: la cocina y el repartidor interactúan con esta
+tabla para actualizar el estado del pedido.
+
+-----------------------------------------------------------------
+OrderItem.php
+-----------------------------------------------------------------
+Representa una línea del pedido (un plato + cantidad + precio).
+Atributos:
+  - subtotal: calcula quantity × unit_price automáticamente.
+Relaciones:
+  - dish(): el plato que representa.
+Uso en procesos: se crea uno por cada plato seleccionado en el
+carrito al momento de confirmar el pedido.
+
+
+================================================================
+  3. MIDDLEWARE — app/Http/Middleware/
+================================================================
+
+-----------------------------------------------------------------
+CheckRole.php
+-----------------------------------------------------------------
+Intercepta las peticiones HTTP y verifica el rol del usuario.
+Si el rol no coincide con lo requerido, lanza error 403 (prohibido).
+Uso en procesos: protege todas las rutas de admin, cocina, cliente
+y repartidor. Por ejemplo, un cliente que intente entrar a /admin
+recibirá un error 403 automáticamente.
+Registrado en: bootstrap/app.php como alias 'role'.
+
+
+================================================================
+  4. CONTROLADORES — app/Http/Controllers/
+================================================================
+
+Los controladores reciben las peticiones del navegador, consultan
+los modelos y devuelven una vista o redirigen.
+
+-----------------------------------------------------------------
+HomeController.php
+-----------------------------------------------------------------
+Maneja las páginas públicas.
+Métodos:
+  - index(): carga los restaurantes activos y muestra la página
+    de inicio (home.blade.php).
+  - menu(): carga los restaurantes activos y muestra la página
+    de menú público (menu.blade.php).
+  - about(): muestra la página "Nosotros" (about.blade.php).
+
+-----------------------------------------------------------------
+OrderController.php
+-----------------------------------------------------------------
+Maneja el proceso de hacer un pedido (proceso principal).
+Métodos:
+  - restaurants(): muestra la lista de restaurantes disponibles
+    para el cliente (orders/restaurants.blade.php).
+  - menu($restaurant): recibe el restaurante elegido, carga sus
+    platos disponibles agrupados por categoría y muestra el menú
+    interactivo con carrito (orders/menu.blade.php).
+  - store(): recibe los datos del formulario del carrito,
+    calcula el total, crea el Order y los OrderItems en la BD,
+    y redirige al detalle del pedido.
+  - show($order): muestra el detalle de un pedido específico.
+    Solo el cliente dueño del pedido o el admin pueden verlo
+    (controlado por OrderPolicy).
+  - index(): muestra todos los pedidos del cliente autenticado.
+
+-----------------------------------------------------------------
+KitchenController.php
+-----------------------------------------------------------------
+Maneja el panel del personal de cocina.
+Métodos:
+  - index(): carga los pedidos activos (pending, confirmed,
+    preparing, ready) y los muestra al personal de cocina.
+  - updateStatus($order): recibe el nuevo estado desde el
+    formulario y actualiza el pedido en la BD.
+    Estados posibles: confirmed → preparing → ready → cancelled.
+
+-----------------------------------------------------------------
+DeliveryController.php
+-----------------------------------------------------------------
+Maneja el panel del repartidor.
+Métodos:
+  - index(): carga los pedidos en estado 'ready' (listos para
+    recoger) y los que ya están 'delivering' asignados al
+    repartidor actual.
+  - updateStatus($order): cuando el repartidor toma un pedido
+    (delivering), se guarda su id en delivery_id del pedido.
+    Cuando lo marca como entregado, cambia a 'delivered'.
+
+-----------------------------------------------------------------
+Admin/RestaurantController.php
+-----------------------------------------------------------------
+CRUD completo de restaurantes para el administrador.
+Métodos: index, create, store, edit, update, destroy.
+Restricción: si el restaurante tiene platos, no se puede eliminar.
+Proceso: el admin puede activar/desactivar restaurantes, lo que
+controla si aparecen en el menú público y en la lista de pedidos.
+
+-----------------------------------------------------------------
+Admin/DishController.php
+-----------------------------------------------------------------
+CRUD completo de platos para el administrador.
+Métodos: index, create, store, edit, update, destroy.
+Campos clave: restaurant_id y category_id (se seleccionan por
+nombre en el formulario, no por ID manual).
+Restricción: si el plato tiene pedidos asociados, no se puede
+eliminar para mantener la integridad de los datos históricos.
+
+-----------------------------------------------------------------
+Admin/CategoryController.php
+-----------------------------------------------------------------
+CRUD completo de categorías para el administrador.
+Restricción: no se puede eliminar una categoría que tenga platos.
+
+-----------------------------------------------------------------
+Admin/UserController.php
+-----------------------------------------------------------------
+CRUD completo de usuarios para el administrador.
+Permite crear usuarios con cualquier rol y editar sus datos.
+Restricción: el admin no puede eliminarse a sí mismo.
+
+
+================================================================
+  5. RUTAS — routes/web.php
+================================================================
+
+Define todas las URLs de la app y qué controlador las maneja.
+Organizado en grupos según rol:
+
+  Rutas públicas (sin login):
+    GET /             → página de inicio
+    GET /menu         → lista de restaurantes (público)
+    GET /nosotros     → página informativa
+
+  Rutas de administrador (middleware: auth + role:admin):
+    /admin/restaurants → CRUD de restaurantes
+    /admin/users       → CRUD de usuarios
+    /admin/categories  → CRUD de categorías
+    /admin/dishes      → CRUD de platos
+
+  Rutas de cliente (middleware: auth + role:client,admin):
+    GET  /pedir              → lista de restaurantes para pedir
+    GET  /pedir/{restaurant} → menú del restaurante + carrito
+    POST /pedidos            → crear pedido (submit del carrito)
+    GET  /pedidos            → mis pedidos
+    GET  /pedidos/{order}    → detalle de un pedido
+
+  Rutas de cocina (middleware: auth + role:kitchen,admin):
+    GET   /cocina                    → panel de cocina
+    PATCH /cocina/{order}/estado     → actualizar estado del pedido
+
+  Rutas de repartidor (middleware: auth + role:delivery,admin):
+    GET   /entregas                  → panel de entregas
+    PATCH /entregas/{order}/estado   → tomar o entregar pedido
+
+
+================================================================
+  6. VISTAS — resources/views/
+================================================================
+
+-----------------------------------------------------------------
+layouts/app.blade.php
+-----------------------------------------------------------------
+Plantilla base de toda la app. Contiene:
+  - Navbar con logo, links públicos y links condicionales por rol.
+  - Mensajes flash de éxito/error.
+  - @yield('content'): espacio donde cada vista inserta su contenido.
+  - Footer con links y horario.
+
+-----------------------------------------------------------------
+home.blade.php
+-----------------------------------------------------------------
+Página de inicio. Secciones:
+  - Hero: título, descripción, botones "Pedir ahora" y "Ver restaurantes".
+  - Stats: número de restaurantes, platos, tiempo de entrega.
+  - Cómo funciona: 4 pasos del proceso de pedido.
+  - Restaurantes destacados: cards de los restaurantes activos.
+  - Roles: explicación de los 4 roles de la plataforma.
+  - CTA: llamado a registrarse o iniciar sesión.
+
+-----------------------------------------------------------------
+menu.blade.php
+-----------------------------------------------------------------
+Página pública de restaurantes. Muestra cards de todos los
+restaurantes activos. Si el usuario está logueado, el botón
+"Ver menú" lleva al menú del restaurante para hacer un pedido.
+Si no está logueado, redirige al login.
+
+-----------------------------------------------------------------
+orders/restaurants.blade.php
+-----------------------------------------------------------------
+Vista solo para clientes autenticados. Lista los restaurantes
+disponibles con un link directo a su menú + carrito.
+Proceso: es el primer paso del flujo de pedido.
+
+-----------------------------------------------------------------
+orders/menu.blade.php
+-----------------------------------------------------------------
+Vista del menú de un restaurante con carrito interactivo.
+Muestra los platos disponibles agrupados por categoría.
+El cliente usa los botones +/- para agregar platos.
+JavaScript actualiza el carrito en tiempo real sin recargar la página.
+Al confirmar, envía los ítems, dirección y notas al servidor.
+Proceso: es el segundo paso del flujo de pedido.
+
+-----------------------------------------------------------------
+orders/index.blade.php
+-----------------------------------------------------------------
+Lista todos los pedidos del cliente autenticado con su estado
+actual (Pendiente, Preparando, En camino, etc.).
+
+-----------------------------------------------------------------
+orders/show.blade.php
+-----------------------------------------------------------------
+Detalle de un pedido: lista de platos, cantidades, precios,
+total y estado. Solo accesible por el cliente dueño o el admin.
+
+-----------------------------------------------------------------
+kitchen/index.blade.php
+-----------------------------------------------------------------
+Panel del personal de cocina. Muestra pedidos activos con
+borde de color según estado. Tiene formulario para actualizar
+el estado de cada pedido con un botón.
+
+-----------------------------------------------------------------
+delivery/index.blade.php
+-----------------------------------------------------------------
+Panel del repartidor. Muestra todos los pedidos listos para
+recoger y los que ya están en camino.
+El repartidor elige cuál tomar con el botón "Tomar y salir
+a entregar". Solo puede marcar como entregado sus propios pedidos.
+
+-----------------------------------------------------------------
+admin/restaurants/ (index, create, edit)
+-----------------------------------------------------------------
+Vistas del CRUD de restaurantes para el admin.
+  - index: tabla con todos los restaurantes, estado activo/inactivo
+    y botones de editar/eliminar.
+  - create/edit: formulario con nombre, descripción y checkbox
+    de activo.
+
+-----------------------------------------------------------------
+admin/dishes/ (index, create, edit)
+-----------------------------------------------------------------
+Vistas del CRUD de platos. Los formularios incluyen selectores
+de restaurante y categoría (se muestra el nombre, no el ID).
+
+-----------------------------------------------------------------
+admin/categories/ (index, create, edit)
+-----------------------------------------------------------------
+Vistas del CRUD de categorías.
+
+-----------------------------------------------------------------
+admin/users/ (index, create, edit)
+-----------------------------------------------------------------
+Vistas del CRUD de usuarios con selector de rol.
+
+
+================================================================
+  7. FLUJO COMPLETO DEL PROCESO PRINCIPAL (HACER UN PEDIDO)
+================================================================
+
+1. El cliente inicia sesión → redirigido a /pedir
+   Código: routes/web.php (dashboard redirect) → OrderController::restaurants()
+   Vista: orders/restaurants.blade.php
+
+2. Elige un restaurante → va a /pedir/{id del restaurante}
+   Código: OrderController::menu($restaurant)
+   Vista: orders/menu.blade.php
+   El controlador carga los platos del restaurante agrupados por categoría.
+
+3. Agrega platos al carrito (JavaScript)
+   Código: JavaScript en orders/menu.blade.php
+   Función changeQty() actualiza cantidades y el total en tiempo real.
+   Los ítems se guardan como inputs hidden en el formulario.
+
+4. Ingresa dirección y confirma el pedido → POST /pedidos
+   Código: OrderController::store()
+   - Valida los datos recibidos.
+   - Calcula el total sumando precio × cantidad de cada plato.
+   - Crea un registro en la tabla orders.
+   - Crea un registro en order_items por cada plato seleccionado.
+   - Redirige al detalle del pedido con mensaje de confirmación.
+
+5. La cocina ve el pedido en /cocina
+   Código: KitchenController::index()
+   Vista: kitchen/index.blade.php
+   El personal actualiza el estado: pending → confirmed → preparing → ready
+
+6. El repartidor ve el pedido listo en /entregas
+   Código: DeliveryController::index()
+   Vista: delivery/index.blade.php
+   Elige el pedido y lo marca como "delivering" (se guarda su ID).
+   Al entregar, lo marca como "delivered".
+
+7. El cliente ve el estado actualizado en /pedidos
+   Código: OrderController::index() y show()
+   Vista: orders/index.blade.php y orders/show.blade.php
+
+
+================================================================
+  8. USUARIOS DE PRUEBA (SEEDER)
+================================================================
+
+  admin@eathidden.com    → rol: admin     → contraseña: password
+  cocina@eathidden.com   → rol: kitchen   → contraseña: password
+  delivery@eathidden.com → rol: delivery  → contraseña: password
+  cliente@eathidden.com  → rol: client    → contraseña: password
+
+
+================================================================
+  9. DATOS DE PRUEBA SEMBRADOS
+================================================================
+
+Restaurantes:
+  - Burger Underground (hamburguesas)
+  - La Cocina Oculta (tacos y burritos)
+  - Ramen Lab (ramen y noodles)
+  - Pizza Secreta (pizzas)
+
+Categorías: Hamburguesas, Tacos & Burritos, Ramen & Noodles, Pizzas, Bebidas
+
+12 platos distribuidos entre los 4 restaurantes.
+1 pedido de prueba en estado "preparing" del cliente Ana.
+
+
+================================================================
+  10. CONFIGURACIÓN TÉCNICA
+================================================================
+
+  Framework:    Laravel 12 con Breeze (autenticación)
+  Frontend:     Tailwind CSS v4 + Vite
+  Base de datos: MySQL — nombre: eat_hidden
+  Servidor:     php artisan serve → http://localhost:8000
+  Assets:       compilados con npm run build
+
+================================================================

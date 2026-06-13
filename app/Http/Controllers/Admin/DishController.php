@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Dish;
+use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,25 +13,27 @@ class DishController extends Controller
 {
     public function index()
     {
-        $dishes = Dish::with('category')->orderBy('name')->get();
+        $dishes = Dish::with('category', 'restaurant')->orderBy('name')->get();
         return view('admin.dishes.index', compact('dishes'));
     }
 
     public function create()
     {
-        $categories = Category::where('active', true)->orderBy('name')->get();
-        return view('admin.dishes.create', compact('categories'));
+        $categories  = Category::where('active', true)->orderBy('name')->get();
+        $restaurants = Restaurant::where('active', true)->orderBy('name')->get();
+        return view('admin.dishes.create', compact('categories', 'restaurants'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name'        => 'required|string|max:150',
-            'description' => 'nullable|string|max:500',
-            'price'       => 'required|numeric|min:0',
-            'image'       => 'nullable|image|max:2048',
-            'available'   => 'boolean',
+            'restaurant_id' => 'required|exists:restaurants,id',
+            'category_id'   => 'required|exists:categories,id',
+            'name'          => 'required|string|max:150',
+            'description'   => 'nullable|string|max:500',
+            'price'         => 'required|numeric|min:0',
+            'image'         => 'nullable|image|max:2048',
+            'available'     => 'boolean',
         ]);
 
         if ($request->hasFile('image')) {
@@ -45,19 +48,21 @@ class DishController extends Controller
 
     public function edit(Dish $dish)
     {
-        $categories = Category::where('active', true)->orderBy('name')->get();
-        return view('admin.dishes.edit', compact('dish', 'categories'));
+        $categories  = Category::where('active', true)->orderBy('name')->get();
+        $restaurants = Restaurant::where('active', true)->orderBy('name')->get();
+        return view('admin.dishes.edit', compact('dish', 'categories', 'restaurants'));
     }
 
     public function update(Request $request, Dish $dish)
     {
         $data = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name'        => 'required|string|max:150',
-            'description' => 'nullable|string|max:500',
-            'price'       => 'required|numeric|min:0',
-            'image'       => 'nullable|image|max:2048',
-            'available'   => 'boolean',
+            'restaurant_id' => 'required|exists:restaurants,id',
+            'category_id'   => 'required|exists:categories,id',
+            'name'          => 'required|string|max:150',
+            'description'   => 'nullable|string|max:500',
+            'price'         => 'required|numeric|min:0',
+            'image'         => 'nullable|image|max:2048',
+            'available'     => 'boolean',
         ]);
 
         if ($request->hasFile('image')) {

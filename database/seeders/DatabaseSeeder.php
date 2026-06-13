@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Dish;
 use App\Models\Order;
+use App\Models\Restaurant;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -13,7 +14,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Usuarios de prueba por rol
+        // Usuarios
         $admin = User::create([
             'name'     => 'Admin EatHidden',
             'email'    => 'admin@eathidden.com',
@@ -22,7 +23,7 @@ class DatabaseSeeder extends Seeder
             'phone'    => '999-000-001',
         ]);
 
-        $kitchen = User::create([
+        User::create([
             'name'     => 'Chef Carlos',
             'email'    => 'cocina@eathidden.com',
             'password' => Hash::make('password'),
@@ -47,53 +48,67 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Categorías
-        $hamburguesasCat = Category::create(['name' => 'Hamburguesas', 'description' => 'Burgers artesanales', 'active' => true]);
-        $tacosCat        = Category::create(['name' => 'Tacos & Burritos', 'description' => 'Cocina mexicana', 'active' => true]);
-        $ramiCat         = Category::create(['name' => 'Ramen & Noodles', 'description' => 'Cocina asiática', 'active' => true]);
-        $pizzaCat        = Category::create(['name' => 'Pizzas', 'description' => 'Pizzas al horno de piedra', 'active' => true]);
-        $bebidasCat      = Category::create(['name' => 'Bebidas', 'description' => 'Bebidas frías y calientes', 'active' => true]);
+        $hamburguesasCat = Category::create(['name' => 'Hamburguesas',    'description' => 'Burgers artesanales',        'active' => true]);
+        $tacosCat        = Category::create(['name' => 'Tacos & Burritos','description' => 'Cocina mexicana',            'active' => true]);
+        $ramiCat         = Category::create(['name' => 'Ramen & Noodles', 'description' => 'Cocina asiática',           'active' => true]);
+        $pizzaCat        = Category::create(['name' => 'Pizzas',          'description' => 'Pizzas al horno de piedra', 'active' => true]);
+        $bebidasCat      = Category::create(['name' => 'Bebidas',         'description' => 'Bebidas frías y calientes', 'active' => true]);
 
-        // Platos
-        $dishes = [
-            // Hamburguesas
-            ['category_id' => $hamburguesasCat->id, 'name' => 'Burger Clásica', 'description' => 'Carne angus, queso cheddar, lechuga, tomate y salsa especial.', 'price' => 28.00, 'available' => true],
-            ['category_id' => $hamburguesasCat->id, 'name' => 'Burger BBQ Crispy', 'description' => 'Pollo crocante, salsa BBQ ahumada, cebolla caramelizada.', 'price' => 32.00, 'available' => true],
-            ['category_id' => $hamburguesasCat->id, 'name' => 'Burger Doble', 'description' => 'Doble carne, doble queso, bacon, encurtidos y mostaza.', 'price' => 42.00, 'available' => true],
-            // Tacos
-            ['category_id' => $tacosCat->id, 'name' => 'Taco al Pastor', 'description' => 'Cerdo marinado, piña, cilantro y cebolla. x3 unidades.', 'price' => 22.00, 'available' => true],
-            ['category_id' => $tacosCat->id, 'name' => 'Burrito Carnitas', 'description' => 'Cerdo deshebrado, arroz, frijoles, guacamole y crema.', 'price' => 30.00, 'available' => true],
-            // Ramen
-            ['category_id' => $ramiCat->id, 'name' => 'Ramen Tonkotsu', 'description' => 'Caldo de cerdo 12h, huevo marinado, nori y chashu.', 'price' => 38.00, 'available' => true],
-            ['category_id' => $ramiCat->id, 'name' => 'Ramen Miso Vegano', 'description' => 'Base miso, tofu, maíz, champiñones y algas.', 'price' => 34.00, 'available' => true],
-            // Pizzas
-            ['category_id' => $pizzaCat->id, 'name' => 'Pizza Margherita', 'description' => 'Salsa de tomate, mozzarella fresca y albahaca.', 'price' => 35.00, 'available' => true],
-            ['category_id' => $pizzaCat->id, 'name' => 'Pizza Pepperoni', 'description' => 'Salsa de tomate, mozzarella y pepperoni artesanal.', 'price' => 40.00, 'available' => true],
-            // Bebidas
-            ['category_id' => $bebidasCat->id, 'name' => 'Limonada Frozen', 'description' => 'Limón, hielo y menta fresca.', 'price' => 10.00, 'available' => true],
-            ['category_id' => $bebidasCat->id, 'name' => 'Agua con gas', 'description' => 'Botella 600ml.', 'price' => 5.00, 'available' => true],
-        ];
+        // Restaurantes (dark kitchens)
+        $burgerKitchen = Restaurant::create([
+            'name'        => 'Burger Underground',
+            'description' => 'Dark kitchen especializada en hamburguesas artesanales con ingredientes premium.',
+            'active'      => true,
+        ]);
 
-        foreach ($dishes as $dishData) {
-            Dish::create($dishData);
-        }
+        $mexicanKitchen = Restaurant::create([
+            'name'        => 'La Cocina Oculta',
+            'description' => 'Auténtica comida mexicana preparada por chefs con técnicas tradicionales.',
+            'active'      => true,
+        ]);
+
+        $asianKitchen = Restaurant::create([
+            'name'        => 'Ramen Lab',
+            'description' => 'Especialistas en ramen con caldos preparados por más de 12 horas.',
+            'active'      => true,
+        ]);
+
+        $pizzaKitchen = Restaurant::create([
+            'name'        => 'Pizza Secreta',
+            'description' => 'Pizzas al horno de piedra con masa madre y ingredientes importados.',
+            'active'      => true,
+        ]);
+
+        // Platos por restaurante
+        $burger1 = Dish::create(['restaurant_id' => $burgerKitchen->id,  'category_id' => $hamburguesasCat->id, 'name' => 'Burger Clásica',    'description' => 'Carne angus, queso cheddar, lechuga, tomate y salsa especial.',    'price' => 28.00, 'available' => true]);
+        $burger2 = Dish::create(['restaurant_id' => $burgerKitchen->id,  'category_id' => $hamburguesasCat->id, 'name' => 'Burger BBQ Crispy', 'description' => 'Pollo crocante, salsa BBQ ahumada, cebolla caramelizada.',           'price' => 32.00, 'available' => true]);
+                   Dish::create(['restaurant_id' => $burgerKitchen->id,  'category_id' => $hamburguesasCat->id, 'name' => 'Burger Doble',      'description' => 'Doble carne, doble queso, bacon, encurtidos y mostaza.',            'price' => 42.00, 'available' => true]);
+        $limon   = Dish::create(['restaurant_id' => $burgerKitchen->id,  'category_id' => $bebidasCat->id,      'name' => 'Limonada Frozen',   'description' => 'Limón, hielo y menta fresca.',                                      'price' => 10.00, 'available' => true]);
+
+                   Dish::create(['restaurant_id' => $mexicanKitchen->id, 'category_id' => $tacosCat->id,        'name' => 'Taco al Pastor',    'description' => 'Cerdo marinado, piña, cilantro y cebolla. x3 unidades.',           'price' => 22.00, 'available' => true]);
+                   Dish::create(['restaurant_id' => $mexicanKitchen->id, 'category_id' => $tacosCat->id,        'name' => 'Burrito Carnitas',  'description' => 'Cerdo deshebrado, arroz, frijoles, guacamole y crema.',            'price' => 30.00, 'available' => true]);
+                   Dish::create(['restaurant_id' => $mexicanKitchen->id, 'category_id' => $bebidasCat->id,      'name' => 'Agua de Jamaica',   'description' => 'Bebida fresca de flor de Jamaica. 500ml.',                         'price' => 8.00,  'available' => true]);
+
+        $ramen   = Dish::create(['restaurant_id' => $asianKitchen->id,   'category_id' => $ramiCat->id,         'name' => 'Ramen Tonkotsu',    'description' => 'Caldo de cerdo 12h, huevo marinado, nori y chashu.',               'price' => 38.00, 'available' => true]);
+                   Dish::create(['restaurant_id' => $asianKitchen->id,   'category_id' => $ramiCat->id,         'name' => 'Ramen Miso Vegano', 'description' => 'Base miso, tofu, maíz, champiñones y algas.',                      'price' => 34.00, 'available' => true]);
+
+                   Dish::create(['restaurant_id' => $pizzaKitchen->id,   'category_id' => $pizzaCat->id,        'name' => 'Pizza Margherita',  'description' => 'Salsa de tomate, mozzarella fresca y albahaca.',                   'price' => 35.00, 'available' => true]);
+                   Dish::create(['restaurant_id' => $pizzaKitchen->id,   'category_id' => $pizzaCat->id,        'name' => 'Pizza Pepperoni',   'description' => 'Salsa de tomate, mozzarella y pepperoni artesanal.',               'price' => 40.00, 'available' => true]);
+                   Dish::create(['restaurant_id' => $pizzaKitchen->id,   'category_id' => $bebidasCat->id,      'name' => 'Agua con gas',      'description' => 'Botella 600ml.',                                                   'price' => 5.00,  'available' => true]);
 
         // Pedido de prueba
-        $burger  = Dish::where('name', 'Burger Clásica')->first();
-        $ramen   = Dish::where('name', 'Ramen Tonkotsu')->first();
-        $limon   = Dish::where('name', 'Limonada Frozen')->first();
-
         $order = Order::create([
             'client_id'        => $client->id,
             'status'           => 'preparing',
-            'total'            => ($burger->price * 2) + $ramen->price + $limon->price,
+            'total'            => ($burger1->price * 2) + $ramen->price + $limon->price,
             'delivery_address' => $client->address,
             'notes'            => 'Sin cebolla en las hamburguesas.',
         ]);
 
         $order->items()->createMany([
-            ['dish_id' => $burger->id, 'quantity' => 2, 'unit_price' => $burger->price],
-            ['dish_id' => $ramen->id,  'quantity' => 1, 'unit_price' => $ramen->price],
-            ['dish_id' => $limon->id,  'quantity' => 1, 'unit_price' => $limon->price],
+            ['dish_id' => $burger1->id, 'quantity' => 2, 'unit_price' => $burger1->price],
+            ['dish_id' => $ramen->id,   'quantity' => 1, 'unit_price' => $ramen->price],
+            ['dish_id' => $limon->id,   'quantity' => 1, 'unit_price' => $limon->price],
         ]);
     }
 }

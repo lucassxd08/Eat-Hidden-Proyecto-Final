@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DishController;
+use App\Http\Controllers\Admin\RestaurantController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\HomeController;
@@ -19,10 +20,10 @@ Route::get('/nosotros', [HomeController::class, 'about'])->name('about');
 Route::get('/dashboard', function () {
     $user = auth()->user();
     return match ($user->role) {
-        'admin'    => redirect()->route('admin.users.index'),
+        'admin'    => redirect()->route('admin.restaurants.index'),
         'kitchen'  => redirect()->route('kitchen.index'),
         'delivery' => redirect()->route('delivery.index'),
-        default    => redirect()->route('orders.menu'),
+        default    => redirect()->route('orders.restaurants'),
     };
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -38,11 +39,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('users', UserController::class);
     Route::resource('categories', CategoryController::class);
     Route::resource('dishes', DishController::class);
+    Route::resource('restaurants', RestaurantController::class);
 });
 
-// Cliente (hacer pedidos)
+// Cliente
 Route::middleware(['auth', 'role:client,admin'])->group(function () {
-    Route::get('/pedir', [OrderController::class, 'menu'])->name('orders.menu');
+    Route::get('/pedir', [OrderController::class, 'restaurants'])->name('orders.restaurants');
+    Route::get('/pedir/{restaurant}', [OrderController::class, 'menu'])->name('orders.menu');
     Route::post('/pedidos', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/pedidos', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/pedidos/{order}', [OrderController::class, 'show'])->name('orders.show');

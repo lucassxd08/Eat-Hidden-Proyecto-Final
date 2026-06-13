@@ -5,7 +5,7 @@
 <div class="max-w-4xl mx-auto px-4 py-10">
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-3xl font-bold text-gray-900">Mis pedidos</h1>
-        <a href="{{ route('orders.menu') }}" class="bg-red-500 hover:bg-red-600 text-white font-semibold px-5 py-2.5 rounded-lg transition">
+        <a href="{{ route('orders.restaurants') }}" class="bg-red-500 hover:bg-red-600 text-white font-semibold px-5 py-2.5 rounded-lg transition">
             + Nuevo pedido
         </a>
     </div>
@@ -42,7 +42,7 @@
     <div class="text-center py-20">
         <div class="text-6xl mb-4">🛵</div>
         <p class="text-xl text-gray-500">Aún no tenés pedidos.</p>
-        <a href="{{ route('orders.menu') }}" class="inline-block mt-4 bg-red-500 text-white font-semibold px-6 py-3 rounded-xl hover:bg-red-600 transition">
+        <a href="{{ route('orders.restaurants') }}" class="inline-block mt-4 bg-red-500 text-white font-semibold px-6 py-3 rounded-xl hover:bg-red-600 transition">
             Hacer mi primer pedido
         </a>
     </div>

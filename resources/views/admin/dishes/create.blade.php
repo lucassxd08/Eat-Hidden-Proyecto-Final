@@ -14,6 +14,20 @@
 
             <div class="space-y-5">
                 <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Restaurante *</label>
+                    <select name="restaurant_id"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 @error('restaurant_id') border-red-400 @enderror">
+                        <option value="">— Seleccionar restaurante —</option>
+                        @foreach($restaurants as $restaurant)
+                            <option value="{{ $restaurant->id }}" {{ old('restaurant_id') == $restaurant->id ? 'selected' : '' }}>
+                                {{ $restaurant->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('restaurant_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Categoría *</label>
                     <select name="category_id"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 @error('category_id') border-red-400 @enderror">

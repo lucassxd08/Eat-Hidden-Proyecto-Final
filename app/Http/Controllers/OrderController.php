@@ -2,21 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\Dish;
 use App\Models\Order;
-use App\Models\OrderItem;
+use App\Models\Restaurant;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    public function menu()
+    public function restaurants()
     {
-        $categories = Category::where('active', true)
-            ->with(['dishes' => fn($q) => $q->where('available', true)])
-            ->get();
+        $restaurants = Restaurant::where('active', true)->withCount('dishes')->get();
+        return view('orders.restaurants', compact('restaurants'));
+    }
 
-        return view('orders.menu', compact('categories'));
+    public function menu(Restaurant $restaurant)
+    {
+        $dishes = $restaurant->dishes()
+            ->where('available', true)
+            ->with('category')
+            ->get()
+            ->groupBy('category.name');
+
+        return view('orders.menu', compact('restaurant', 'dishes'));
     }
 
     public function store(Request $request)
@@ -33,10 +40,10 @@ class OrderController extends Controller
         $lines = [];
 
         foreach ($request->items as $item) {
-            $dish = Dish::findOrFail($item['dish_id']);
-            $subtotal = $dish->price * $item['quantity'];
-            $total += $subtotal;
-            $lines[] = [
+            $dish      = Dish::findOrFail($item['dish_id']);
+            $subtotal  = $dish->price * $item['quantity'];
+            $total    += $subtotal;
+            $lines[]   = [
                 'dish_id'    => $dish->id,
                 'quantity'   => $item['quantity'],
                 'unit_price' => $dish->price,
@@ -55,7 +62,7 @@ class OrderController extends Controller
             $order->items()->create($line);
         }
 
-        return redirect()->route('orders.show', $order)->with('success', '¡Pedido realizado con éxito!');
+        return redirect()->route('orders.show', $order)->with('success', '¡Pedido realizado! Pago en efectivo al repartidor.');
     }
 
     public function show(Order $order)

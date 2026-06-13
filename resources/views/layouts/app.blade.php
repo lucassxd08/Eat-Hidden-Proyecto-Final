@@ -26,7 +26,7 @@
 
                 @auth
                     @if(auth()->user()->isClient())
-                        <a href="{{ route('orders.menu') }}" class="hover:text-red-400 transition">Pedir ahora</a>
+                        <a href="{{ route('orders.restaurants') }}" class="hover:text-red-400 transition">Pedir ahora</a>
                         <a href="{{ route('orders.index') }}" class="hover:text-red-400 transition">Mis pedidos</a>
                     @endif
                     @if(auth()->user()->isKitchen())
@@ -36,6 +36,7 @@
                         <a href="{{ route('delivery.index') }}" class="hover:text-red-400 transition">Mis entregas</a>
                     @endif
                     @if(auth()->user()->isAdmin())
+                        <a href="{{ route('admin.restaurants.index') }}" class="hover:text-red-400 transition">Restaurantes</a>
                         <a href="{{ route('admin.users.index') }}" class="hover:text-red-400 transition">Usuarios</a>
                         <a href="{{ route('admin.categories.index') }}" class="hover:text-red-400 transition">Categorías</a>
                         <a href="{{ route('admin.dishes.index') }}" class="hover:text-red-400 transition">Platos</a>
