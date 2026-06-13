@@ -69,6 +69,10 @@ class UserController extends Controller
             return back()->with('error', 'No puedes eliminar tu propio usuario.');
         }
 
+        if ($user->orders()->exists()) {
+            return back()->with('error', 'No se puede eliminar este usuario porque tiene pedidos asociados.');
+        }
+
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'Usuario eliminado.');
     }
