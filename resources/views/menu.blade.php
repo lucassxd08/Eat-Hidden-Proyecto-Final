@@ -4,7 +4,7 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 py-12">
     <h1 class="text-4xl font-bold text-gray-900 mb-2">Nuestros Restaurantes</h1>
-    <p class="text-gray-500 mb-10">Elegí una dark kitchen y explorá su menú</p>
+    <p class="text-gray-500 mb-10">Elige una dark kitchen y explora su menú</p>
 
     @if($restaurants->count())
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

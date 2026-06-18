@@ -41,7 +41,7 @@
     @empty
     <div class="text-center py-20">
         <div class="text-6xl mb-4">🛵</div>
-        <p class="text-xl text-gray-500">Aún no tenés pedidos.</p>
+        <p class="text-xl text-gray-500">Aún no tienes pedidos.</p>
         <a href="{{ route('orders.restaurants') }}" class="inline-block mt-4 bg-red-500 text-white font-semibold px-6 py-3 rounded-xl hover:bg-red-600 transition">
             Hacer mi primer pedido
         </a>

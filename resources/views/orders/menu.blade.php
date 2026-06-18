@@ -59,7 +59,7 @@
                     <h2 class="text-lg font-bold text-gray-800 mb-4">Tu pedido</h2>
 
                     <div id="cart-items" class="space-y-2 mb-4 min-h-[60px]">
-                        <p id="cart-empty" class="text-gray-400 text-sm">Agregá platos para comenzar.</p>
+                        <p id="cart-empty" class="text-gray-400 text-sm">Agrega platos para comenzar.</p>
                     </div>
 
                     <div class="border-t pt-3 mb-4">

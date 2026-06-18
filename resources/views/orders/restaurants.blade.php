@@ -1,11 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Elegí tu restaurante')
+@section('title', 'Elige tu restaurante')
 
 @section('content')
 <div class="max-w-6xl mx-auto px-4 py-8">
     <div class="mb-8 text-center">
-        <h1 class="text-3xl font-bold text-gray-800">¿De dónde querés pedir?</h1>
-        <p class="text-gray-500 mt-2">Elegí un restaurante para ver su menú</p>
+        <h1 class="text-3xl font-bold text-gray-800">¿De dónde quieres pedir?</h1>
+        <p class="text-gray-500 mt-2">Elige un restaurante para ver su menú</p>
     </div>
 
     @if($restaurants->isEmpty())

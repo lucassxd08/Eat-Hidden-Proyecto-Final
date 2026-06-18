@@ -4,7 +4,7 @@
 @section('content')
 <div class="max-w-5xl mx-auto px-4 py-10">
     <h1 class="text-3xl font-bold text-gray-900 mb-2">Panel de Entregas</h1>
-    <p class="text-gray-500 mb-8">Elegí un pedido listo para recoger o gestioná los que ya tenés en camino</p>
+    <p class="text-gray-500 mb-8">Elige un pedido listo para recoger o gestiona los que ya tienes en camino</p>
 
     @if(session('success'))
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">{{ session('success') }}</div>

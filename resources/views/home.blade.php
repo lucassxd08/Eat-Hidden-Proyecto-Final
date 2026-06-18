@@ -73,13 +73,13 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div class="text-center p-6 bg-gray-50 rounded-2xl">
                 <div class="text-5xl mb-4">🏪</div>
-                <h3 class="text-lg font-semibold mb-2">1. Elegís tu cocina</h3>
+                <h3 class="text-lg font-semibold mb-2">1. Elige tu cocina</h3>
                 <p class="text-gray-500 text-sm">Explorá las distintas dark kitchens y sus especialidades.</p>
             </div>
             <div class="text-center p-6 bg-gray-50 rounded-2xl">
                 <div class="text-5xl mb-4">🛒</div>
                 <h3 class="text-lg font-semibold mb-2">2. Armás tu pedido</h3>
-                <p class="text-gray-500 text-sm">Seleccioná los platos que querés y confirmás el pedido.</p>
+                <p class="text-gray-500 text-sm">Selecciona los platos que quieres y confirma el pedido.</p>
             </div>
             <div class="text-center p-6 bg-gray-50 rounded-2xl">
                 <div class="text-5xl mb-4">👨‍🍳</div>
