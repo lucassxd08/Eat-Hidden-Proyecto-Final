@@ -66,27 +66,27 @@
 </section>
 
 {{-- Cómo funciona --}}
-<section class="py-16 bg-white">
+<section class="py-16 bg-gray-800">
     <div class="max-w-7xl mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">¿Cómo funciona?</h2>
+        <h2 class="text-3xl font-bold text-center text-white mb-4">¿Cómo funciona?</h2>
         <p class="text-center text-gray-500 mb-12">De la cocina a tu puerta en simples pasos</p>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div class="text-center p-6 bg-gray-50 rounded-2xl">
+            <div class="text-center p-6 bg-gray-900 rounded-2xl">
                 <div class="text-5xl mb-4">🏪</div>
                 <h3 class="text-lg font-semibold mb-2">1. Elige tu cocina</h3>
                 <p class="text-gray-500 text-sm">Explorá las distintas dark kitchens y sus especialidades.</p>
             </div>
-            <div class="text-center p-6 bg-gray-50 rounded-2xl">
+            <div class="text-center p-6 bg-gray-900 rounded-2xl">
                 <div class="text-5xl mb-4">🛒</div>
                 <h3 class="text-lg font-semibold mb-2">2. Armás tu pedido</h3>
                 <p class="text-gray-500 text-sm">Selecciona los platos que quieres y confirma el pedido.</p>
             </div>
-            <div class="text-center p-6 bg-gray-50 rounded-2xl">
+            <div class="text-center p-6 bg-gray-900 rounded-2xl">
                 <div class="text-5xl mb-4">👨‍🍳</div>
                 <h3 class="text-lg font-semibold mb-2">3. La cocina prepara</h3>
                 <p class="text-gray-500 text-sm">El equipo de cocina recibe y prepara tu orden.</p>
             </div>
-            <div class="text-center p-6 bg-gray-50 rounded-2xl">
+            <div class="text-center p-6 bg-gray-900 rounded-2xl">
                 <div class="text-5xl mb-4">🛵</div>
                 <h3 class="text-lg font-semibold mb-2">4. Lo recibís</h3>
                 <p class="text-gray-500 text-sm">El repartidor lleva tu pedido directo a tu domicilio.</p>
@@ -97,19 +97,19 @@
 
 {{-- Restaurantes destacados --}}
 @if($restaurants->count())
-<section class="py-16 bg-gray-50">
+<section class="py-16 bg-gray-900">
     <div class="max-w-7xl mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">Restaurantes destacados</h2>
+        <h2 class="text-3xl font-bold text-center text-white mb-4">Restaurantes destacados</h2>
         <p class="text-center text-gray-500 mb-12">Conocé nuestras dark kitchens disponibles</p>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach($restaurants as $restaurant)
-            <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition group">
+            <div class="bg-gray-800 rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition group">
                 <div class="bg-red-50 h-40 flex items-center justify-center text-6xl group-hover:bg-red-100 transition">
                     🍽️
                 </div>
                 <div class="p-5">
-                    <h3 class="font-bold text-lg text-gray-800">{{ $restaurant->name }}</h3>
+                    <h3 class="font-bold text-lg text-white">{{ $restaurant->name }}</h3>
                     @if($restaurant->description)
                         <p class="text-gray-500 text-sm mt-1 line-clamp-2">{{ $restaurant->description }}</p>
                     @endif
@@ -176,11 +176,11 @@
         <p class="text-red-100 mb-8">Creá tu cuenta y hacé tu primer pedido en minutos.</p>
         <div class="flex flex-wrap justify-center gap-4">
             @auth
-                <a href="{{ route('orders.restaurants') }}" class="bg-white text-red-500 hover:bg-red-50 font-bold px-8 py-3 rounded-xl transition">
+                <a href="{{ route('orders.restaurants') }}" class="bg-gray-800 text-red-500 hover:bg-red-50 font-bold px-8 py-3 rounded-xl transition">
                     Elegir restaurante
                 </a>
             @else
-                <a href="{{ route('register') }}" class="bg-white text-red-500 hover:bg-red-50 font-bold px-8 py-3 rounded-xl transition">
+                <a href="{{ route('register') }}" class="bg-gray-800 text-red-500 hover:bg-red-50 font-bold px-8 py-3 rounded-xl transition">
                     Crear cuenta gratis
                 </a>
                 <a href="{{ route('login') }}" class="border-2 border-white hover:bg-red-600 font-bold px-8 py-3 rounded-xl transition">

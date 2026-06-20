@@ -3,22 +3,22 @@
 
 @section('content')
 <div class="max-w-2xl mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">Editar Restaurante</h1>
+    <h1 class="text-2xl font-bold text-white mb-6">Editar Restaurante</h1>
 
-    <form action="{{ route('admin.restaurants.update', $restaurant) }}" method="POST" class="bg-white rounded-xl shadow p-6 space-y-5">
+    <form action="{{ route('admin.restaurants.update', $restaurant) }}" method="POST" class="bg-gray-800 rounded-xl shadow p-6 space-y-5">
         @csrf @method('PUT')
 
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Nombre *</label>
             <input type="text" name="name" value="{{ old('name', $restaurant->name) }}" required
-                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400">
+                   class="w-full border border-gray-600 rounded-lg px-3 py-2 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-red-400">
             @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
         </div>
 
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Descripción</label>
             <textarea name="description" rows="3"
-                      class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400">{{ old('description', $restaurant->description) }}</textarea>
+                      class="w-full border border-gray-600 rounded-lg px-3 py-2 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-red-400">{{ old('description', $restaurant->description) }}</textarea>
             @error('description')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
         </div>
 
@@ -26,7 +26,7 @@
             <input type="checkbox" name="active" value="1" id="active"
                    {{ $restaurant->active ? 'checked' : '' }}
                    class="w-4 h-4 accent-red-500">
-            <label for="active" class="text-sm text-gray-700">Restaurante activo (visible para clientes)</label>
+            <label for="active" class="text-sm text-gray-300">Restaurante activo (visible para clientes)</label>
         </div>
 
         <div class="flex gap-3 pt-2">
@@ -35,7 +35,7 @@
                 Actualizar
             </button>
             <a href="{{ route('admin.restaurants.index') }}"
-               class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-semibold">
+               class="bg-gray-700 hover:bg-gray-600 text-gray-300 px-6 py-2 rounded-lg font-semibold">
                 Cancelar
             </a>
         </div>

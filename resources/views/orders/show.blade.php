@@ -5,28 +5,28 @@
 <div class="max-w-2xl mx-auto px-4 py-10">
     <div class="mb-6">
         <a href="{{ route('orders.index') }}" class="text-red-500 hover:underline text-sm">&larr; Mis pedidos</a>
-        <h1 class="text-3xl font-bold text-gray-900 mt-2">Pedido #{{ $order->id }}</h1>
+        <h1 class="text-3xl font-bold text-white mt-2">Pedido #{{ $order->id }}</h1>
     </div>
 
-    <div class="bg-white rounded-2xl shadow p-8 space-y-6">
+    <div class="bg-gray-800 rounded-2xl shadow p-8 space-y-6">
         {{-- Estado --}}
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm text-gray-500">Estado actual</p>
-                <p class="text-xl font-bold text-gray-900 mt-1">{{ $order->status_label }}</p>
+                <p class="text-xl font-bold text-white mt-1">{{ $order->status_label }}</p>
             </div>
             @php
                 $statusColors = [
-                    'pending'    => 'bg-yellow-100 text-yellow-700',
-                    'confirmed'  => 'bg-blue-100 text-blue-700',
-                    'preparing'  => 'bg-red-100 text-red-700',
-                    'ready'      => 'bg-green-100 text-green-700',
-                    'delivering' => 'bg-indigo-100 text-indigo-700',
-                    'delivered'  => 'bg-green-200 text-green-800',
-                    'cancelled'  => 'bg-red-100 text-red-700',
+                    'pending'    => 'bg-yellow-900 text-yellow-300',
+                    'confirmed'  => 'bg-blue-900 text-blue-300',
+                    'preparing'  => 'bg-red-900 text-red-300',
+                    'ready'      => 'bg-green-900 text-green-300',
+                    'delivering' => 'bg-indigo-900 text-indigo-300',
+                    'delivered'  => 'bg-green-800 text-green-200',
+                    'cancelled'  => 'bg-red-900 text-red-300',
                 ];
             @endphp
-            <span class="px-4 py-2 rounded-full text-sm font-semibold {{ $statusColors[$order->status] ?? 'bg-gray-100 text-gray-600' }}">
+            <span class="px-4 py-2 rounded-full text-sm font-semibold {{ $statusColors[$order->status] ?? 'bg-gray-800 text-gray-400' }}">
                 {{ $order->status_label }}
             </span>
         </div>
@@ -61,7 +61,7 @@
 
         {{-- Items --}}
         <div>
-            <h2 class="font-bold text-gray-800 mb-3">Detalle del pedido</h2>
+            <h2 class="font-bold text-white mb-3">Detalle del pedido</h2>
             <table class="w-full text-sm">
                 <thead class="text-gray-500 border-b">
                     <tr>
@@ -71,7 +71,7 @@
                         <th class="pb-2 text-right">Subtotal</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-700">
                     @foreach($order->items as $item)
                     <tr>
                         <td class="py-2">{{ $item->dish->name }}</td>
@@ -83,7 +83,7 @@
                 </tbody>
                 <tfoot class="border-t">
                     <tr>
-                        <td colspan="3" class="pt-3 text-right font-bold text-gray-900">Total</td>
+                        <td colspan="3" class="pt-3 text-right font-bold text-white">Total</td>
                         <td class="pt-3 text-right font-bold text-red-500 text-lg">S/ {{ number_format($order->total, 2) }}</td>
                     </tr>
                 </tfoot>

@@ -3,13 +3,13 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto px-4 py-16">
-    <h1 class="text-4xl font-bold text-gray-900 mb-4">¿Quiénes somos?</h1>
+    <h1 class="text-4xl font-bold text-white mb-4">¿Quiénes somos?</h1>
     <p class="text-gray-500 text-lg mb-12">La plataforma que conecta dark kitchens con sus clientes.</p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
         <div>
             <h2 class="text-2xl font-bold mb-4 text-red-500">Nuestra misión</h2>
-            <p class="text-gray-600 leading-relaxed">
+            <p class="text-gray-400 leading-relaxed">
                 EatHidden nació para dar visibilidad a los mejores cocineros que operan
                 sin un local físico. Creemos que la calidad no necesita cuatro paredes:
                 solo necesita pasión, ingredientes frescos y un buen sistema de delivery.
@@ -17,7 +17,7 @@
         </div>
         <div>
             <h2 class="text-2xl font-bold mb-4 text-red-500">¿Qué es una dark kitchen?</h2>
-            <p class="text-gray-600 leading-relaxed">
+            <p class="text-gray-400 leading-relaxed">
                 Una dark kitchen es un restaurante 100% orientado al delivery: sin salón,
                 sin atención presencial. Esto permite reducir costos y enfocarse únicamente
                 en preparar comida de alta calidad para envío a domicilio.

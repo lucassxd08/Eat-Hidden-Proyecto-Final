@@ -7,7 +7,7 @@
     <div class="mb-6 flex items-center gap-4">
         <a href="{{ route('orders.restaurants') }}" class="text-red-500 hover:underline text-sm">← Volver a restaurantes</a>
         <div>
-            <h1 class="text-2xl font-bold text-gray-800">{{ $restaurant->name }}</h1>
+            <h1 class="text-2xl font-bold text-white">{{ $restaurant->name }}</h1>
             @if($restaurant->description)
                 <p class="text-gray-500 text-sm">{{ $restaurant->description }}</p>
             @endif
@@ -28,12 +28,12 @@
             <div class="flex-1 space-y-8">
                 @foreach($dishes as $categoryName => $categoryDishes)
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">{{ $categoryName ?? 'Sin categoría' }}</h2>
+                    <h2 class="text-lg font-semibold text-gray-300 mb-3 border-b pb-2">{{ $categoryName ?? 'Sin categoría' }}</h2>
                     <div class="space-y-3">
                         @foreach($categoryDishes as $dish)
-                        <div class="bg-white rounded-xl shadow-sm p-4 flex justify-between items-center gap-4">
+                        <div class="bg-gray-800 rounded-xl shadow-sm p-4 flex justify-between items-center gap-4">
                             <div class="flex-1">
-                                <p class="font-semibold text-gray-800">{{ $dish->name }}</p>
+                                <p class="font-semibold text-white">{{ $dish->name }}</p>
                                 @if($dish->description)
                                     <p class="text-sm text-gray-500">{{ $dish->description }}</p>
                                 @endif
@@ -41,7 +41,7 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 <button type="button" onclick="changeQty({{ $dish->id }}, -1)"
-                                        class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 font-bold text-lg leading-none">−</button>
+                                        class="w-8 h-8 rounded-full bg-gray-700 hover:bg-gray-600 font-bold text-lg leading-none">−</button>
                                 <span id="qty-{{ $dish->id }}" class="w-6 text-center font-semibold">0</span>
                                 <button type="button" onclick="changeQty({{ $dish->id }}, 1)"
                                         class="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white font-bold text-lg leading-none">+</button>
@@ -55,15 +55,15 @@
 
             {{-- Carrito --}}
             <div class="w-full lg:w-80">
-                <div class="bg-white rounded-xl shadow p-5 sticky top-4">
-                    <h2 class="text-lg font-bold text-gray-800 mb-4">Tu pedido</h2>
+                <div class="bg-gray-800 rounded-xl shadow p-5 sticky top-4">
+                    <h2 class="text-lg font-bold text-white mb-4">Tu pedido</h2>
 
                     <div id="cart-items" class="space-y-2 mb-4 min-h-[60px]">
                         <p id="cart-empty" class="text-gray-400 text-sm">Agrega platos para comenzar.</p>
                     </div>
 
                     <div class="border-t pt-3 mb-4">
-                        <div class="flex justify-between font-bold text-gray-800">
+                        <div class="flex justify-between font-bold text-white">
                             <span>Total</span>
                             <span>S/ <span id="cart-total">0.00</span></span>
                         </div>
@@ -72,16 +72,16 @@
 
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección de entrega *</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Dirección de entrega *</label>
                             <input type="text" name="delivery_address" required
                                    value="{{ auth()->user()->address }}"
                                    placeholder="Tu dirección completa"
-                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                                   class="w-full border border-gray-600 rounded-lg px-3 py-2 bg-gray-900 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Notas (opcional)</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Notas (opcional)</label>
                             <textarea name="notes" rows="2" placeholder="Sin cebolla, extra salsa..."
-                                      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"></textarea>
+                                      class="w-full border border-gray-600 rounded-lg px-3 py-2 bg-gray-900 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-400"></textarea>
                         </div>
                     </div>
 
@@ -127,7 +127,7 @@ function updateCart() {
         if (qty > 0) {
             const subtotal = prices[id] * qty;
             total += subtotal;
-            html += `<div class="flex justify-between text-sm text-gray-700">
+            html += `<div class="flex justify-between text-sm text-gray-300">
                         <span>${names[id]} x${qty}</span>
                         <span>S/ ${subtotal.toFixed(2)}</span>
                      </div>`;
