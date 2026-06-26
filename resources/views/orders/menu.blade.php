@@ -28,7 +28,7 @@
             <div class="flex-1 space-y-8">
                 @foreach($dishes as $categoryName => $categoryDishes)
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-300 mb-3 border-b pb-2">{{ $categoryName ?? 'Sin categoría' }}</h2>
+                    <h2 class="text-lg font-semibold text-gray-300 mb-3 border-b border-gray-700 pb-2">{{ $categoryName ?? 'Sin categoría' }}</h2>
                     <div class="space-y-3">
                         @foreach($categoryDishes as $dish)
                         <div class="bg-gray-800 rounded-xl shadow-sm p-4 flex justify-between items-center gap-4">
@@ -88,7 +88,7 @@
                     <div id="cart-inputs"></div>
 
                     <button type="submit" id="submit-btn" disabled
-                            class="w-full mt-4 bg-red-500 hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg transition-colors">
+                            class="w-full mt-4 bg-red-500 hover:bg-red-600 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg transition-colors">
                         Realizar Pedido
                     </button>
                 </div>

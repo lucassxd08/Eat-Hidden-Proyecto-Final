@@ -104,9 +104,30 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach($restaurants as $restaurant)
-            <div class="bg-gray-800 rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition group">
-                <div class="bg-red-50 h-40 flex items-center justify-center text-6xl group-hover:bg-red-100 transition">
-                    🍽️
+            @php
+                $texto = strtolower($restaurant->name . ' ' . $restaurant->description);
+                if (str_contains($texto, 'burger') || str_contains($texto, 'hamburgues')) {
+                    $emoji = '🍔'; $gradiente = 'from-orange-900 via-gray-800 to-gray-800';
+                } elseif (str_contains($texto, 'pizza')) {
+                    $emoji = '🍕'; $gradiente = 'from-red-900 via-gray-800 to-gray-800';
+                } elseif (str_contains($texto, 'ramen') || str_contains($texto, 'noodle') || str_contains($texto, 'asiat')) {
+                    $emoji = '🍜'; $gradiente = 'from-yellow-900 via-gray-800 to-gray-800';
+                } elseif (str_contains($texto, 'taco') || str_contains($texto, 'mexic') || str_contains($texto, 'burrito')) {
+                    $emoji = '🌮'; $gradiente = 'from-green-900 via-gray-800 to-gray-800';
+                } elseif (str_contains($texto, 'sushi') || str_contains($texto, 'japan')) {
+                    $emoji = '🍣'; $gradiente = 'from-pink-900 via-gray-800 to-gray-800';
+                } elseif (str_contains($texto, 'pollo') || str_contains($texto, 'chicken')) {
+                    $emoji = '🍗'; $gradiente = 'from-amber-900 via-gray-800 to-gray-800';
+                } elseif (str_contains($texto, 'ensalada') || str_contains($texto, 'vegano') || str_contains($texto, 'saludable')) {
+                    $emoji = '🥗'; $gradiente = 'from-emerald-900 via-gray-800 to-gray-800';
+                } else {
+                    $emoji = '🍽️'; $gradiente = 'from-gray-700 via-gray-800 to-gray-800';
+                }
+            @endphp
+            <div class="bg-gray-800 rounded-2xl shadow-md overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-200 group">
+                <div class="h-44 bg-gradient-to-br {{ $gradiente }} flex items-center justify-center relative overflow-hidden">
+                    <span class="text-8xl drop-shadow-lg group-hover:scale-110 transition-transform duration-300">{{ $emoji }}</span>
+                    <div class="absolute inset-0 bg-black/10"></div>
                 </div>
                 <div class="p-5">
                     <h3 class="font-bold text-lg text-white">{{ $restaurant->name }}</h3>
@@ -176,11 +197,11 @@
         <p class="text-red-100 mb-8">Creá tu cuenta y hacé tu primer pedido en minutos.</p>
         <div class="flex flex-wrap justify-center gap-4">
             @auth
-                <a href="{{ route('orders.restaurants') }}" class="bg-gray-800 text-red-500 hover:bg-red-50 font-bold px-8 py-3 rounded-xl transition">
+                <a href="{{ route('orders.restaurants') }}" class="bg-gray-800 text-red-400 hover:bg-gray-700 font-bold px-8 py-3 rounded-xl transition">
                     Elegir restaurante
                 </a>
             @else
-                <a href="{{ route('register') }}" class="bg-gray-800 text-red-500 hover:bg-red-50 font-bold px-8 py-3 rounded-xl transition">
+                <a href="{{ route('register') }}" class="bg-gray-800 text-red-400 hover:bg-gray-700 font-bold px-8 py-3 rounded-xl transition">
                     Crear cuenta gratis
                 </a>
                 <a href="{{ route('login') }}" class="border-2 border-white hover:bg-red-600 font-bold px-8 py-3 rounded-xl transition">
