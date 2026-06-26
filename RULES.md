@@ -92,5 +92,5 @@ los accesos de los usuarios y cualquier otra consideración que considere necesa
 3.3. Explique la distribución de su código. Deberá detallar cualquier consideración que hayan
 tomado en cuanto a los modelos, controladores y rutas. Explique si han usado
 componentes, layouts o algún módulo externo.
-Adicionalmente, deberán presentar la subsanación de problemas detectados en la presentación
+4. Adicionalmente, deberán presentar la subsanación de problemas detectados en la presentación
 anterior.
