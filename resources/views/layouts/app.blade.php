@@ -21,7 +21,7 @@
         {{-- Logo --}}
         <div class="p-5 border-b border-gray-800">
             <a href="{{ route('home') }}" class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center font-bold text-xs text-white">EH</div>
+                <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center text-base">🍔</div>
                 <div>
                     <p class="font-bold text-white text-sm leading-tight">Eat Hidden</p>
                     <p class="text-xs text-gray-500 uppercase tracking-widest" style="font-size:9px">Dark Kitchen Perú</p>
@@ -62,18 +62,30 @@
             @endif
 
             @if(auth()->user()->isKitchen() || auth()->user()->isAdmin())
+            @php $cocina_count = \App\Models\Order::whereIn('status', ['pending','confirmed','preparing'])->count(); @endphp
             <a href="{{ route('kitchen.index') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-gray-800 hover:text-white transition {{ request()->routeIs('kitchen.*') ? 'bg-gray-800 text-white' : '' }}">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z"/></svg>
-                Cocina
+               class="flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-gray-800 hover:text-white transition {{ request()->routeIs('kitchen.*') ? 'bg-gray-800 text-white' : '' }}">
+                <span class="flex items-center gap-3">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z"/></svg>
+                    Cocina
+                </span>
+                @if($cocina_count > 0)
+                    <span class="bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{{ $cocina_count }}</span>
+                @endif
             </a>
             @endif
 
             @if(auth()->user()->isDelivery() || auth()->user()->isAdmin())
+            @php $delivery_count = \App\Models\Order::where('status', 'ready')->count(); @endphp
             <a href="{{ route('delivery.index') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-gray-800 hover:text-white transition {{ request()->routeIs('delivery.*') ? 'bg-gray-800 text-white' : '' }}">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                Delivery
+               class="flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-gray-800 hover:text-white transition {{ request()->routeIs('delivery.*') ? 'bg-gray-800 text-white' : '' }}">
+                <span class="flex items-center gap-3">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    Delivery
+                </span>
+                @if($delivery_count > 0)
+                    <span class="bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{{ $delivery_count }}</span>
+                @endif
             </a>
             @endif
 
@@ -172,7 +184,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <a href="{{ route('home') }}" class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center font-bold text-xs">EH</div>
+                <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center text-base">🍔</div>
                 <div>
                     <p class="font-bold text-white text-sm leading-tight">Eat Hidden</p>
                     <p class="text-gray-500 uppercase tracking-widest" style="font-size:9px">Dark Kitchen Perú</p>
@@ -214,7 +226,7 @@
     <div class="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
             <div class="flex items-center gap-2 mb-3">
-                <div class="w-7 h-7 bg-red-500 rounded-lg flex items-center justify-center font-bold text-xs">EH</div>
+                <div class="w-7 h-7 bg-red-500 rounded-lg flex items-center justify-center text-sm">🍔</div>
                 <p class="text-white font-bold">Eat Hidden</p>
             </div>
             <p class="text-sm">Dark kitchen delivery. Comida de calidad, directo a tu puerta.</p>
