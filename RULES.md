@@ -61,3 +61,36 @@ las páginas que conforman el proceso deben estar funcionales. El resto de pági
 completan el flujo pueden ser solo páginas HTML.
 Prepare escenarios de prueba para su proceso principal. Estos escenarios deben tomar
 en cuenta que deberá ingresar a su aplicación con usuarios con distintos perfiles.
+
+ENTREGABLE DE LA TERCERA PRESENTACIÓN DEL PROYECTO
+Sobre el proyecto del curso, deberá exponer lo siguiente:
+1. CRUD: Implemente todos los mantenimientos CRUD (Create, Read, Update, Delete) sobre
+tablas principales de su proyecto.
+1.1. Desarrolle los CRUD con sus funcionalidades completas. Recuerde que la cantidad de
+CRUD depende de la cantidad de miembros de su grupo de trabajo.
+1.2. Los CRUD no deben ser sobre las tablas de Usuarios ni de Perfiles.
+1.3. La funcionalidad DELETE no es requerida, pero si se implementa se debe tomar en
+cuenta que, al ejecutar la eliminación de un registro, no se presenten errores por la
+integridad de los datos.
+1.4. Si los campos ID de las tablas son autogenerados, estos no deberán ser mostrados en
+las páginas de cada CRUD, tampoco deben ser ingresados ni editados.
+1.5. En todas las páginas de los CRUD, los valores de los campos foreign keys de las tablas
+deben mostrarse con su nombre o descripción, no deben mostrarse los ID.
+2. Proceso secundario de su proyecto:
+2.1. Desarrolle el flujo del proceso secundario de su proyecto. Considere que parte de las
+páginas que conforman el flujo deben estar funcionales. El resto de páginas que
+completan el flujo pueden ser solo páginas HTML.
+2.2. Prepare escenarios de prueba para su proceso secundario. Estos escenarios deben
+tomar en cuenta que deberá ingresar a su aplicación con usuarios con distintos perfiles.
+3. Código del proyecto:
+3.1. Explique el código de su aplicación.
+Desarrollo de Aplicaciones en Internet: 3 C24 Secciones A y B
+Clases, atributos y métodos
+3.2. Explique las características de su aplicación en su código. Deberá detallar si su equipo
+ha decido usar alguna extensión o módulo externo, si han empleado algún Starter Kit para
+los accesos de los usuarios y cualquier otra consideración que considere necesaria.
+3.3. Explique la distribución de su código. Deberá detallar cualquier consideración que hayan
+tomado en cuanto a los modelos, controladores y rutas. Explique si han usado
+componentes, layouts o algún módulo externo.
+Adicionalmente, deberán presentar la subsanación de problemas detectados en la presentación
+anterior.
