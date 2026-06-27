@@ -18,6 +18,7 @@
             <thead class="bg-zinc-900 text-gray-400 uppercase text-xs">
                 <tr>
                     <th class="px-6 py-4 text-left">Nombre</th>
+                    <th class="px-6 py-4 text-left">Restaurante</th>
                     <th class="px-6 py-4 text-left">Categoría</th>
                     <th class="px-6 py-4 text-left">Descripción</th>
                     <th class="px-6 py-4 text-right">Precio</th>
@@ -29,6 +30,7 @@
                 @forelse($dishes as $dish)
                 <tr class="hover:bg-zinc-800">
                     <td class="px-6 py-4 font-medium text-white">{{ $dish->name }}</td>
+                    <td class="px-6 py-4 text-gray-400">{{ $dish->restaurant->name ?? '—' }}</td>
                     <td class="px-6 py-4 text-gray-400">{{ $dish->category->name }}</td>
                     <td class="px-6 py-4 text-gray-500 max-w-xs truncate">{{ $dish->description ?? '—' }}</td>
                     <td class="px-6 py-4 text-right font-semibold text-red-600">S/ {{ number_format($dish->price, 2) }}</td>
@@ -51,7 +53,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="px-6 py-10 text-center text-gray-400">No hay platos registrados.</td>
+                    <td colspan="7" class="px-6 py-10 text-center text-gray-400">No hay platos registrados.</td>
                 </tr>
                 @endforelse
             </tbody>

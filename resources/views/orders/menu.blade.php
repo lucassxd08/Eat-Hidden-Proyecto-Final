@@ -125,11 +125,7 @@
 
                         <div id="yape-payment-section" class="hidden rounded-xl border border-zinc-700 bg-zinc-950/70 p-3 space-y-3">
                             <div class="text-center">
-<<<<<<< HEAD
-                                <img src="{{ asset('images/yape-qr.jpg') }}" alt="Código QR de Yape" class="mx-auto rounded-lg border border-zinc-700 max-h-48 object-contain">
-=======
-                                <img id="yape-qr-code" src="{{ asset('images/yape-qr.jpg') }}" alt="Código QR de Yape" class="mx-auto rounded-lg border border-gray-700 max-h-48 object-contain">
->>>>>>> ad37690 (Fix order receipt view and cast fecha_pago to datetime)
+                                <img id="yape-qr-code" src="{{ asset('images/yape-qr.jpg') }}" alt="Código QR de Yape" class="mx-auto rounded-lg border border-zinc-700 max-h-48 object-contain">
                             </div>
                             <div class="text-sm text-gray-300 space-y-1">
                                 <p class="font-semibold text-white">Monto total: S/ <span id="payment-total">0.00</span></p>
