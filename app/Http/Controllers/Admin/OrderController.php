@@ -27,4 +27,25 @@ class OrderController extends Controller
 
         return back()->with('success', 'Estado del pedido actualizado.');
     }
+
+    public function updatePaymentStatus(Request $request, Order $order)
+    {
+        $request->validate([
+            'estado_pago' => 'required|in:Pendiente,Pagado,Rechazado',
+        ]);
+
+        $status = match ($request->estado_pago) {
+            'Pagado' => 'confirmed',
+            'Rechazado' => 'cancelled',
+            default => $order->status,
+        };
+
+        $order->update([
+            'estado_pago' => $request->estado_pago,
+            'fecha_pago' => $order->fecha_pago ?? now(),
+            'status' => $status,
+        ]);
+
+        return back()->with('success', 'Estado de pago actualizado.');
+    }
 }

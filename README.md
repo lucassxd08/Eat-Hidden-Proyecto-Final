@@ -54,6 +54,44 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
+## Proyecto personalizado: Yape Payment Flow
+
+Este proyecto Laravel fue extendido para incluir un método de pago adicional mediante Yape con generación automática de comprobante.
+
+### Cambios principales
+- Nuevo método de pago `Yape` en el flujo de checkout.
+- Generación automática de comprobante de pago en `storage/app/public/comprobantes` cuando el usuario elige Yape.
+- Eliminado el campo de subida manual de comprobante en la pantalla de pedido.
+- Reemplazo del método en efectivo por `Tarjeta` en el checkout.
+- Vista de pedido actualizada para mostrar la imagen del comprobante cuando el pago se marca como `Pagado`.
+- Panel de administración actualizado para ver el comprobante, el método de pago y el estado de pago.
+- Migración agregada para los campos `metodo_pago`, `estado_pago` y `fecha_pago` en la tabla `orders`.
+
+### Archivos relevantes
+- `app/Http/Controllers/OrderController.php`
+- `app/Http/Controllers/Admin/OrderController.php`
+- `app/Models/Order.php`
+- `resources/views/orders/menu.blade.php`
+- `resources/views/orders/show.blade.php`
+- `resources/views/admin/orders/index.blade.php`
+- `database/migrations/0009_add_payment_fields_to_orders_table.php`
+
+### Cómo preparar el proyecto
+1. Ejecutar migraciones:
+   - `php artisan migrate`
+2. Crear el enlace público de storage:
+   - `php artisan storage:link`
+3. Generar los assets de frontend:
+   - `npm install`
+   - `npm run build`
+4. Levantar el servidor para presentar:
+   - `php artisan serve`
+
+### Notas de exposición
+- El QR de Yape se muestra en la pantalla de checkout.
+- El comprobante se genera automáticamente en el servidor; el usuario no necesita subirlo.
+- El panel de administración permite cambiar el estado de pago entre `Pendiente`, `Pagado` y `Rechazado`.
+
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

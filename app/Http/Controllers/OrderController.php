@@ -34,6 +34,7 @@ class OrderController extends Controller
             'items.*.quantity' => 'required|integer|min:1',
             'delivery_address' => 'required|string|max:255',
             'notes'            => 'nullable|string|max:500',
+            'payment_method'   => 'required|in:Card,Yape',
         ]);
 
         $total = 0;
@@ -56,13 +57,20 @@ class OrderController extends Controller
             'total'            => $total,
             'delivery_address' => $request->delivery_address,
             'notes'            => $request->notes,
+            'metodo_pago'      => $request->payment_method,
+            'estado_pago'      => $request->payment_method === 'Yape' ? 'Pendiente' : null,
+            'fecha_pago'       => now(),
         ]);
 
         foreach ($lines as $line) {
             $order->items()->create($line);
         }
 
-        return redirect()->route('orders.show', $order)->with('success', '¡Pedido realizado! Pago en efectivo al repartidor.');
+        $message = $request->payment_method === 'Yape'
+            ? '¡Pedido realizado! Tu pago con Yape está pendiente de confirmación.'
+            : '¡Pedido realizado! Pago con tarjeta registrado.';
+
+        return redirect()->route('orders.show', $order)->with('success', $message);
     }
 
     public function show(Order $order)

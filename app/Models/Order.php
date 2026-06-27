@@ -9,6 +9,7 @@ class Order extends Model
     protected $fillable = [
         'client_id', 'delivery_id', 'status',
         'total', 'delivery_address', 'notes',
+        'metodo_pago', 'estado_pago', 'fecha_pago',
     ];
 
     public static array $statuses = [

@@ -59,6 +59,21 @@
 
         <hr>
 
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div>
+                <p class="text-gray-500">Método de pago</p>
+                <p class="font-medium">{{ $order->metodo_pago === 'Yape' ? 'Yape' : 'Tarjeta' }}</p>
+            </div>
+            @if($order->metodo_pago === 'Yape')
+            <div>
+                <p class="text-gray-500">Estado de pago</p>
+                <p class="font-medium">{{ $order->estado_pago ?? 'Pendiente' }}</p>
+            </div>
+            @endif
+        </div>
+
+        <hr>
+
         {{-- Items --}}
         <div>
             <h2 class="font-bold text-white mb-3">Detalle del pedido</h2>

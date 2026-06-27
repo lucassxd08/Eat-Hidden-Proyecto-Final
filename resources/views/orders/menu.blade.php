@@ -67,7 +67,6 @@
                             <span>Total</span>
                             <span>S/ <span id="cart-total">0.00</span></span>
                         </div>
-                        <p class="text-xs text-gray-400 mt-1">💵 Pago en efectivo al repartidor</p>
                     </div>
 
                     <div class="space-y-3">
@@ -82,6 +81,52 @@
                             <label class="block text-sm font-medium text-gray-300 mb-1">Notas (opcional)</label>
                             <textarea name="notes" rows="2" placeholder="Sin cebolla, extra salsa..."
                                       class="w-full border border-gray-600 rounded-lg px-3 py-2 bg-gray-900 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-400"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Método de pago</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="radio" name="payment_method" value="Card" checked>
+                                    Tarjeta
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-gray-300">
+                                    <input type="radio" name="payment_method" value="Yape">
+                                    Yape
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="card-payment-section" class="rounded-xl border border-gray-700 bg-gray-900/70 p-3 space-y-3">
+                            <div class="text-sm text-gray-300 space-y-2">
+                                <label class="block text-sm font-medium text-gray-300">Número de tarjeta</label>
+                                <input type="text" name="card_number" inputmode="numeric" maxlength="19" placeholder="1234 5678 9012 3456"
+                                       class="w-full border border-gray-600 rounded-lg px-3 py-2 bg-gray-900 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                                <label class="block text-sm font-medium text-gray-300">Nombre del titular</label>
+                                <input type="text" name="card_name" placeholder="Juan Pérez"
+                                       class="w-full border border-gray-600 rounded-lg px-3 py-2 bg-gray-900 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300">Fecha de expiración</label>
+                                        <input type="text" name="card_expiry" placeholder="MM/AA"
+                                               class="w-full border border-gray-600 rounded-lg px-3 py-2 bg-gray-900 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300">CVV</label>
+                                        <input type="password" name="card_cvv" maxlength="4" placeholder="***"
+                                               class="w-full border border-gray-600 rounded-lg px-3 py-2 bg-gray-900 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="yape-payment-section" class="hidden rounded-xl border border-gray-700 bg-gray-900/70 p-3 space-y-3">
+                            <div class="text-center">
+                                <img src="{{ asset('images/yape-qr.jpg') }}" alt="Código QR de Yape" class="mx-auto rounded-lg border border-gray-700 max-h-48 object-contain">
+                            </div>
+                            <div class="text-sm text-gray-300 space-y-1">
+                                <p class="font-semibold text-white">Monto total: S/ <span id="payment-total">0.00</span></p>
+                                <p>Escanea el código QR con la aplicación Yape y realiza el pago.</p>
+                            </div>
                         </div>
                     </div>
 
@@ -143,7 +188,25 @@ function updateCart() {
     cartItems.innerHTML = html + cartEmpty.outerHTML;
     document.getElementById('cart-inputs').innerHTML = inputsHtml;
     document.getElementById('cart-total').textContent = total.toFixed(2);
+    document.getElementById('payment-total').textContent = total.toFixed(2);
     document.getElementById('submit-btn').disabled = index === 0;
 }
+
+const paymentMethodRadios = document.querySelectorAll('input[name="payment_method"]');
+const cardSection = document.getElementById('card-payment-section');
+const yapeSection = document.getElementById('yape-payment-section');
+
+function togglePaymentSections() {
+    const selected = document.querySelector('input[name="payment_method"]:checked')?.value;
+    cardSection.classList.toggle('hidden', selected !== 'Card');
+    yapeSection.classList.toggle('hidden', selected !== 'Yape');
+}
+
+paymentMethodRadios.forEach((radio) => {
+    radio.addEventListener('change', togglePaymentSections);
+});
+
+togglePaymentSections();
+updateCart();
 </script>
 @endsection
