@@ -28,7 +28,8 @@ class DishController extends Controller
     {
         $data = $request->validate([
             'restaurant_id' => 'required|exists:restaurants,id',
-            'category_id'   => 'required|exists:categories,id',
+            'category_id'   => 'nullable|exists:categories,id',
+            'new_category'  => 'nullable|string|max:100',
             'name'          => 'required|string|max:150',
             'description'   => 'nullable|string|max:500',
             'price'         => 'required|numeric|min:0',
@@ -36,11 +37,24 @@ class DishController extends Controller
             'available'     => 'boolean',
         ]);
 
+        if (empty($data['category_id']) && empty($request->new_category)) {
+            return back()->with('error', 'Debes seleccionar una categoría o escribir una nueva.')->withInput();
+        }
+
         try {
+            if ($request->filled('new_category')) {
+                $category = Category::firstOrCreate(
+                    ['name' => trim($request->new_category)],
+                    ['active' => true]
+                );
+                $data['category_id'] = $category->id;
+            }
+
             if ($request->hasFile('image')) {
                 $data['image'] = $request->file('image')->store('dishes', 'public');
             }
 
+            unset($data['new_category']);
             $data['available'] = $request->boolean('available', true);
             Dish::create($data);
 

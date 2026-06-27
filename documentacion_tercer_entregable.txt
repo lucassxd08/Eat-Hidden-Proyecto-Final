@@ -98,12 +98,15 @@ Modelo:         app/Models/Dish.php
     Carga categorías activas y restaurantes activos para los selectores del formulario.
 
   store(Request $request)
-    Valida: restaurante y categoría deben existir en sus tablas (exists:tabla,id),
-    nombre obligatorio, precio numérico positivo, imagen opcional (máx 2MB).
-    Si hay imagen, se guarda en storage/app/public/dishes/ con ->store().
+    Valida: restaurante obligatorio, nombre obligatorio, precio numérico positivo,
+    imagen opcional (máx 2MB). La categoría puede ser:
+      a) category_id: ID de una categoría ya existente (selector)
+      b) new_category: texto libre → se crea la categoría automáticamente con
+         Category::firstOrCreate() (si ya existe con ese nombre, la reutiliza)
+    Si ninguna de las dos llega, retorna error en español.
+    Si hay imagen, se guarda en storage/app/public/dishes/.
     Envuelto en try-catch con mensaje en español si falla.
-    Si se envió "back_to_restaurant", redirige de vuelta a la gestión del restaurante
-    en vez de ir al listado general de platos.
+    Si se envió "back_to_restaurant", redirige a la gestión del restaurante.
 
   edit(Dish $dish)
     Route Model Binding busca el plato. Carga categorías y restaurantes para los

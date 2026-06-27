@@ -40,11 +40,11 @@
             <input type="hidden" name="back_to_restaurant" value="{{ $restaurant->id }}">
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Categoría *</label>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-300">Categoría *</label>
                     <select name="category_id"
                         class="w-full border border-zinc-700 rounded-lg px-3 py-2 bg-zinc-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-400 @error('category_id') border-red-400 @enderror">
-                        <option value="">— Seleccionar —</option>
+                        <option value="">— Seleccionar existente —</option>
                         @foreach($categories as $cat)
                             <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>
                                 {{ $cat->name }}
@@ -52,6 +52,11 @@
                         @endforeach
                     </select>
                     @error('category_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    <input type="text" name="new_category" value="{{ old('new_category') }}"
+                        placeholder="O escribe una nueva (ej. Combos, Postres...)"
+                        class="w-full border border-zinc-700 rounded-lg px-3 py-2 bg-zinc-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-400 @error('new_category') border-red-400 @enderror">
+                    @error('new_category') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    <p class="text-xs text-gray-500">Elige del selector o escribe una nueva. Se crea automáticamente.</p>
                 </div>
 
                 <div>

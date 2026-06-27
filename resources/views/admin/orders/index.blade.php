@@ -59,7 +59,7 @@
                     <td class="px-6 py-4 text-center">
                         <div class="space-y-1">
                             <p class="text-xs text-gray-500">Método</p>
-                            <p class="text-sm font-medium text-white">{{ $order->metodo_pago ?? 'Efectivo' }}</p>
+                            <p class="text-sm font-medium text-white">{{ $order->metodo_pago ?: 'Efectivo' }}</p>
                             <p class="text-xs text-gray-500">Estado</p>
                             <p class="text-sm font-medium text-white">{{ $order->estado_pago ?? '—' }}</p>
                         </div>

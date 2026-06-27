@@ -123,6 +123,9 @@ class DatabaseSeeder extends Seeder
             'total'            => ($burger1->price * 2) + $ramen->price + $limon->price,
             'delivery_address' => $client->address,
             'notes'            => 'Sin cebolla en las hamburguesas.',
+            'metodo_pago'      => 'Card',
+            'estado_pago'      => null,
+            'fecha_pago'       => now(),
         ]);
 
         $order->items()->createMany([
