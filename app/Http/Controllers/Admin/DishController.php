@@ -36,14 +36,23 @@ class DishController extends Controller
             'available'     => 'boolean',
         ]);
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('dishes', 'public');
+        try {
+            if ($request->hasFile('image')) {
+                $data['image'] = $request->file('image')->store('dishes', 'public');
+            }
+
+            $data['available'] = $request->boolean('available', true);
+            Dish::create($data);
+
+            if ($request->filled('back_to_restaurant')) {
+                return redirect()->route('admin.restaurants.show', $request->back_to_restaurant)
+                    ->with('success', 'Plato añadido correctamente.');
+            }
+
+            return redirect()->route('admin.dishes.index')->with('success', 'Plato creado correctamente.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'No se pudo crear el plato. Intente nuevamente.')->withInput();
         }
-
-        $data['available'] = $request->boolean('available', true);
-        Dish::create($data);
-
-        return redirect()->route('admin.dishes.index')->with('success', 'Plato creado correctamente.');
     }
 
     public function edit(Dish $dish)
@@ -65,17 +74,26 @@ class DishController extends Controller
             'available'     => 'boolean',
         ]);
 
-        if ($request->hasFile('image')) {
-            if ($dish->image) {
-                Storage::disk('public')->delete($dish->image);
+        try {
+            if ($request->hasFile('image')) {
+                if ($dish->image) {
+                    Storage::disk('public')->delete($dish->image);
+                }
+                $data['image'] = $request->file('image')->store('dishes', 'public');
             }
-            $data['image'] = $request->file('image')->store('dishes', 'public');
+
+            $data['available'] = $request->boolean('available', true);
+            $dish->update($data);
+
+            if ($request->filled('back_to_restaurant')) {
+                return redirect()->route('admin.restaurants.show', $request->back_to_restaurant)
+                    ->with('success', 'Plato actualizado correctamente.');
+            }
+
+            return redirect()->route('admin.dishes.index')->with('success', 'Plato actualizado correctamente.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'No se pudo actualizar el plato. Intente nuevamente.')->withInput();
         }
-
-        $data['available'] = $request->boolean('available', true);
-        $dish->update($data);
-
-        return redirect()->route('admin.dishes.index')->with('success', 'Plato actualizado correctamente.');
     }
 
     public function destroy(Dish $dish)
@@ -84,11 +102,31 @@ class DishController extends Controller
             return back()->with('error', 'No se puede eliminar un plato que tiene pedidos asociados.');
         }
 
-        if ($dish->image) {
-            Storage::disk('public')->delete($dish->image);
-        }
+        $restaurantId = $dish->restaurant_id;
 
-        $dish->delete();
-        return redirect()->route('admin.dishes.index')->with('success', 'Plato eliminado.');
+        try {
+            if ($dish->image) {
+                Storage::disk('public')->delete($dish->image);
+            }
+
+            $dish->delete();
+
+            // Si viene del formulario de gestión del restaurante, vuelve allí
+            if (request()->filled('back_to_restaurant')) {
+                return redirect()->route('admin.restaurants.show', request('back_to_restaurant'))
+                    ->with('success', 'Plato eliminado correctamente.');
+            }
+
+            // Si la ruta anterior es la del restaurante, vuelve allí
+            $referer = request()->headers->get('referer', '');
+            if ($restaurantId && str_contains($referer, "/admin/restaurants/{$restaurantId}")) {
+                return redirect()->route('admin.restaurants.show', $restaurantId)
+                    ->with('success', 'Plato eliminado correctamente.');
+            }
+
+            return redirect()->route('admin.dishes.index')->with('success', 'Plato eliminado correctamente.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'No se pudo eliminar el plato. Intente nuevamente.');
+        }
     }
 }

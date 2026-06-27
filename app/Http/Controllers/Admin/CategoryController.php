@@ -27,10 +27,14 @@ class CategoryController extends Controller
             'active'      => 'boolean',
         ]);
 
-        $data['active'] = $request->boolean('active', true);
-        Category::create($data);
+        try {
+            $data['active'] = $request->boolean('active', true);
+            Category::create($data);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Categoría creada correctamente.');
+            return redirect()->route('admin.categories.index')->with('success', 'Categoría creada correctamente.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'No se pudo crear la categoría. Intente nuevamente.')->withInput();
+        }
     }
 
     public function edit(Category $category)
@@ -46,10 +50,14 @@ class CategoryController extends Controller
             'active'      => 'boolean',
         ]);
 
-        $data['active'] = $request->boolean('active', true);
-        $category->update($data);
+        try {
+            $data['active'] = $request->boolean('active', true);
+            $category->update($data);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Categoría actualizada correctamente.');
+            return redirect()->route('admin.categories.index')->with('success', 'Categoría actualizada correctamente.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'No se pudo actualizar la categoría. Intente nuevamente.')->withInput();
+        }
     }
 
     public function destroy(Category $category)
@@ -58,7 +66,11 @@ class CategoryController extends Controller
             return back()->with('error', 'No se puede eliminar una categoría que tiene platos asignados.');
         }
 
-        $category->delete();
-        return redirect()->route('admin.categories.index')->with('success', 'Categoría eliminada.');
+        try {
+            $category->delete();
+            return redirect()->route('admin.categories.index')->with('success', 'Categoría eliminada correctamente.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'No se pudo eliminar la categoría. Intente nuevamente.');
+        }
     }
 }

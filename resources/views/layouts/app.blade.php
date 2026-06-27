@@ -44,8 +44,9 @@
                 Menú
             </a>
 
+            @if(!auth()->user()->isClient())
             @php $cocina_count = \App\Models\Order::whereIn('status', ['pending','confirmed','preparing'])->count(); @endphp
-            <a href="{{ auth()->user()->isAdmin() ? route('kitchen.index') : route('kitchen.index') }}"
+            <a href="{{ route('kitchen.index') }}"
                class="flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-zinc-900 hover:text-white transition {{ request()->routeIs('kitchen.*') ? 'bg-zinc-900 text-white' : '' }}">
                 <span class="flex items-center gap-3">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z"/></svg>
@@ -55,8 +56,8 @@
                     <span class="bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{{ $cocina_count }}</span>
                 @endif
             </a>
+            @endif
 
-            @php $delivery_count = \App\Models\Order::where('status', 'ready')->count(); @endphp
             @php
                 $pedidosRoute = auth()->user()->isAdmin()
                     ? route('admin.orders.index')
@@ -69,6 +70,8 @@
                 Pedidos
             </a>
 
+            @if(!auth()->user()->isClient())
+            @php $delivery_count = \App\Models\Order::where('status', 'ready')->count(); @endphp
             <a href="{{ route('delivery.index') }}"
                class="flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-zinc-900 hover:text-white transition {{ request()->routeIs('delivery.*') ? 'bg-zinc-900 text-white' : '' }}">
                 <span class="flex items-center gap-3">
@@ -79,6 +82,7 @@
                     <span class="bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{{ $delivery_count }}</span>
                 @endif
             </a>
+            @endif
 
         </nav>
 

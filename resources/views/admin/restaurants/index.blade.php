@@ -43,12 +43,14 @@
                         @endif
                     </td>
                     <td class="px-6 py-4 text-center space-x-2">
+                        <a href="{{ route('admin.restaurants.show', $restaurant) }}"
+                           class="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-lg transition">Gestionar</a>
                         <a href="{{ route('admin.restaurants.edit', $restaurant) }}"
-                           class="text-blue-400 hover:underline">Editar</a>
+                           class="text-blue-400 hover:underline text-xs">Editar</a>
                         <form action="{{ route('admin.restaurants.destroy', $restaurant) }}" method="POST" class="inline"
                               onsubmit="return confirm('¿Eliminar este restaurante?')">
                             @csrf @method('DELETE')
-                            <button class="text-red-600 hover:underline">Eliminar</button>
+                            <button class="text-red-600 hover:underline text-xs">Eliminar</button>
                         </form>
                     </td>
                 </tr>

@@ -3,14 +3,22 @@
 
 @section('content')
 <div class="max-w-2xl mx-auto px-4 py-10">
+    @php $backRestaurant = request('back'); @endphp
     <div class="mb-6">
-        <a href="{{ route('admin.dishes.index') }}" class="text-red-500 hover:underline text-sm">&larr; Volver a platos</a>
+        @if($backRestaurant)
+            <a href="{{ route('admin.restaurants.show', $backRestaurant) }}" class="text-red-500 hover:underline text-sm">&larr; Volver al restaurante</a>
+        @else
+            <a href="{{ route('admin.dishes.index') }}" class="text-red-500 hover:underline text-sm">&larr; Volver a platos</a>
+        @endif
         <h1 class="text-3xl font-bold text-white mt-2">Editar plato</h1>
     </div>
 
     <div class="bg-zinc-900 rounded-2xl shadow p-8">
         <form method="POST" action="{{ route('admin.dishes.update', $dish) }}" enctype="multipart/form-data">
             @csrf @method('PATCH')
+            @if($backRestaurant)
+                <input type="hidden" name="back_to_restaurant" value="{{ $backRestaurant }}">
+            @endif
 
             <div class="space-y-5">
                 <div>

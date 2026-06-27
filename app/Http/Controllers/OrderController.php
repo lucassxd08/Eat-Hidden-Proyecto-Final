@@ -37,47 +37,50 @@ class OrderController extends Controller
             'payment_method'   => 'required|in:Card,Yape',
         ]);
 
-        $total = 0;
-        $lines = [];
+        try {
+            $total = 0;
+            $lines = [];
 
-        foreach ($request->items as $item) {
-            $dish      = Dish::findOrFail($item['dish_id']);
-            $subtotal  = $dish->price * $item['quantity'];
-            $total    += $subtotal;
-            $lines[]   = [
-                'dish_id'    => $dish->id,
-                'quantity'   => $item['quantity'],
-                'unit_price' => $dish->price,
-            ];
+            foreach ($request->items as $item) {
+                $dish     = Dish::findOrFail($item['dish_id']);
+                $subtotal = $dish->price * $item['quantity'];
+                $total   += $subtotal;
+                $lines[]  = [
+                    'dish_id'    => $dish->id,
+                    'quantity'   => $item['quantity'],
+                    'unit_price' => $dish->price,
+                ];
+            }
+
+            $order = Order::create([
+                'client_id'        => auth()->id(),
+                'status'           => 'pending',
+                'total'            => $total,
+                'delivery_address' => $request->delivery_address,
+                'notes'            => $request->notes,
+                'metodo_pago'      => $request->payment_method,
+                'estado_pago'      => $request->payment_method === 'Yape' ? 'Pendiente' : null,
+                'fecha_pago'       => now(),
+            ]);
+
+            foreach ($lines as $line) {
+                $order->items()->create($line);
+            }
+
+            $message = $request->payment_method === 'Yape'
+                ? '¡Pedido realizado! Tu pago con Yape está pendiente de confirmación.'
+                : '¡Pedido realizado! Pago con tarjeta registrado.';
+
+            return redirect()->route('orders.show', $order)->with('success', $message);
+        } catch (\Exception $e) {
+            return back()->with('error', 'No se pudo procesar el pedido. Intente nuevamente.')->withInput();
         }
-
-        $order = Order::create([
-            'client_id'        => auth()->id(),
-            'status'           => 'pending',
-            'total'            => $total,
-            'delivery_address' => $request->delivery_address,
-            'notes'            => $request->notes,
-            'metodo_pago'      => $request->payment_method,
-            'estado_pago'      => $request->payment_method === 'Yape' ? 'Pendiente' : null,
-            'fecha_pago'       => now(),
-        ]);
-
-        foreach ($lines as $line) {
-            $order->items()->create($line);
-        }
-
-        $message = $request->payment_method === 'Yape'
-            ? '¡Pedido realizado! Tu pago con Yape está pendiente de confirmación.'
-            : '¡Pedido realizado! Pago con tarjeta registrado.';
-
-        return redirect()->route('orders.show', $order)->with('success', $message);
     }
 
     public function show(Order $order)
     {
         $this->authorize('view', $order);
         $order->load('client', 'items.dish', 'deliveryPerson');
-
         return view('orders.show', compact('order'));
     }
 
