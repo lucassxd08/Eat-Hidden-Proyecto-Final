@@ -67,6 +67,10 @@
                             <span>Total</span>
                             <span>S/ <span id="cart-total">0.00</span></span>
                         </div>
+                        <div class="flex justify-between text-sm text-gray-400 mt-2">
+                            <span>Método de pago</span>
+                            <span id="selected-payment-method">Tarjeta</span>
+                        </div>
                     </div>
 
                     <div class="space-y-3">
@@ -121,11 +125,15 @@
 
                         <div id="yape-payment-section" class="hidden rounded-xl border border-zinc-700 bg-zinc-950/70 p-3 space-y-3">
                             <div class="text-center">
+<<<<<<< HEAD
                                 <img src="{{ asset('images/yape-qr.jpg') }}" alt="Código QR de Yape" class="mx-auto rounded-lg border border-zinc-700 max-h-48 object-contain">
+=======
+                                <img id="yape-qr-code" src="{{ asset('images/yape-qr.jpg') }}" alt="Código QR de Yape" class="mx-auto rounded-lg border border-gray-700 max-h-48 object-contain">
+>>>>>>> ad37690 (Fix order receipt view and cast fecha_pago to datetime)
                             </div>
                             <div class="text-sm text-gray-300 space-y-1">
                                 <p class="font-semibold text-white">Monto total: S/ <span id="payment-total">0.00</span></p>
-                                <p>Escanea el código QR con la aplicación Yape y realiza el pago.</p>
+                                <p>Escanea el código QR con la aplicación Yape y realiza el pago usando tu cuenta de Yape.</p>
                             </div>
                         </div>
                     </div>
@@ -199,6 +207,10 @@ function updateCart() {
     document.getElementById('cart-inputs').innerHTML = inputsHtml;
     document.getElementById('cart-total').textContent = total.toFixed(2);
     document.getElementById('payment-total').textContent = total.toFixed(2);
+    document.getElementById('selected-payment-method').textContent = document.querySelector('input[name="payment_method"]:checked')?.value === 'Yape' ? 'Yape' : 'Tarjeta';
+
+    // Usamos el QR real de Yape desde public/images/yape-qr.jpg.
+    // No lo reemplazamos con un QR genérico automático.
     document.getElementById('submit-btn').disabled = index === 0;
 }
 

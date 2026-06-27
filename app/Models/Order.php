@@ -12,6 +12,11 @@ class Order extends Model
         'metodo_pago', 'estado_pago', 'fecha_pago',
     ];
 
+    protected $casts = [
+        'fecha_pago' => 'datetime',
+        'total' => 'decimal:2',
+    ];
+
     public static array $statuses = [
         'pending'    => 'Pendiente',
         'confirmed'  => 'Confirmado',
