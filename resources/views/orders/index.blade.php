@@ -27,7 +27,7 @@
             <p class="font-bold text-white">Pedido #{{ $order->id }}</p>
             <p class="text-gray-500 text-sm mt-1">{{ $order->created_at->format('d/m/Y H:i') }}</p>
             <p class="text-gray-500 text-sm">{{ $order->items->count() }} plato(s)</p>
-            <p class="text-gray-500 text-sm">Pago: {{ $order->metodo_pago === 'Yape' ? 'Yape' : 'Tarjeta' }}</p>
+            <p class="text-gray-500 text-sm">Pago: {{ $order->metodo_pago ?? 'Efectivo' }}</p>
         </div>
         <div class="text-right">
             <p class="font-bold text-red-500 text-lg">S/ {{ number_format($order->total, 2) }}</p>

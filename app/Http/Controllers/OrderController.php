@@ -76,7 +76,7 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         $this->authorize('view', $order);
-        $order->load('items.dish', 'deliveryPerson');
+        $order->load('client', 'items.dish', 'deliveryPerson');
 
         return view('orders.show', compact('order'));
     }
