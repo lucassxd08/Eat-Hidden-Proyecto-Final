@@ -305,7 +305,7 @@ El proyecto sigue la arquitectura MVC de Laravel (Modelo - Vista - Controlador).
 
   SEEDER (database/seeders/DatabaseSeeder.php)
     Crea 4 usuarios (admin, cocina, cliente, repartidor), 4 restaurantes,
-    5 categorías, 12 platos y 1 pedido de prueba.
+    5 categorías, 29 platos y 1 pedido de prueba.
     Se ejecuta con: php artisan migrate:fresh --seed --force
 
 
