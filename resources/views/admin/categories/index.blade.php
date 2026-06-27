@@ -13,9 +13,9 @@
         </a>
     </div>
 
-    <div class="bg-gray-800 rounded-2xl shadow overflow-hidden">
+    <div class="bg-zinc-900 rounded-2xl shadow overflow-hidden">
         <table class="w-full text-sm">
-            <thead class="bg-gray-800 text-gray-400 uppercase text-xs">
+            <thead class="bg-zinc-900 text-gray-400 uppercase text-xs">
                 <tr>
                     <th class="px-6 py-4 text-left">Nombre</th>
                     <th class="px-6 py-4 text-left">Descripción</th>
@@ -24,9 +24,9 @@
                     <th class="px-6 py-4 text-center">Acciones</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-700">
+            <tbody class="divide-y divide-zinc-800">
                 @forelse($categories as $category)
-                <tr class="hover:bg-gray-700">
+                <tr class="hover:bg-zinc-800">
                     <td class="px-6 py-4 font-medium text-white">{{ $category->name }}</td>
                     <td class="px-6 py-4 text-gray-500">{{ $category->description ?? '—' }}</td>
                     <td class="px-6 py-4 text-center text-gray-400">{{ $category->dishes_count }}</td>
@@ -34,7 +34,7 @@
                         @if($category->active)
                             <span class="bg-green-900 text-green-300 text-xs font-semibold px-2.5 py-1 rounded-full">Activa</span>
                         @else
-                            <span class="bg-gray-800 text-gray-500 text-xs font-semibold px-2.5 py-1 rounded-full">Inactiva</span>
+                            <span class="bg-zinc-900 text-gray-500 text-xs font-semibold px-2.5 py-1 rounded-full">Inactiva</span>
                         @endif
                     </td>
                     <td class="px-6 py-4 text-center">

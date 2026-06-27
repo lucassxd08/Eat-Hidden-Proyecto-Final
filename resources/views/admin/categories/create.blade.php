@@ -8,7 +8,7 @@
         <h1 class="text-3xl font-bold text-white mt-2">Nueva categoría</h1>
     </div>
 
-    <div class="bg-gray-800 rounded-2xl shadow p-8">
+    <div class="bg-zinc-900 rounded-2xl shadow p-8">
         <form method="POST" action="{{ route('admin.categories.store') }}">
             @csrf
 
@@ -16,14 +16,14 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-1">Nombre *</label>
                     <input type="text" name="name" value="{{ old('name') }}"
-                        class="w-full border border-gray-600 rounded-lg px-3 py-2 bg-gray-900 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-400 @error('name') border-red-400 @enderror">
+                        class="w-full border border-zinc-700 rounded-lg px-3 py-2 bg-zinc-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-400 @error('name') border-red-400 @enderror">
                     @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-1">Descripción</label>
                     <input type="text" name="description" value="{{ old('description') }}"
-                        class="w-full border border-gray-600 rounded-lg px-3 py-2 bg-gray-900 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                        class="w-full border border-zinc-700 rounded-lg px-3 py-2 bg-zinc-950 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
                 </div>
 
                 <div class="flex items-center gap-2">
@@ -35,7 +35,7 @@
             </div>
 
             <div class="mt-6 flex justify-end gap-3">
-                <a href="{{ route('admin.categories.index') }}" class="border border-gray-600 text-gray-400 px-5 py-2 rounded-lg hover:bg-gray-700 text-sm transition">
+                <a href="{{ route('admin.categories.index') }}" class="border border-zinc-700 text-gray-400 px-5 py-2 rounded-lg hover:bg-zinc-800 text-sm transition">
                     Cancelar
                 </a>
                 <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-semibold px-5 py-2 rounded-lg text-sm transition">

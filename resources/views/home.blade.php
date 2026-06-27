@@ -4,7 +4,7 @@
 @section('content')
 
 {{-- Hero --}}
-<section class="bg-gray-900 text-white">
+<section class="bg-zinc-950 text-white">
     <div class="max-w-7xl mx-auto px-4 py-24 flex flex-col md:flex-row items-center gap-12">
         <div class="flex-1">
             <span class="text-red-400 font-semibold text-sm uppercase tracking-wider">Plataforma de delivery</span>
@@ -33,7 +33,7 @@
             </div>
         </div>
         <div class="flex-1 flex justify-center">
-            <div class="bg-gray-800 rounded-2xl p-10 text-center shadow-2xl w-72">
+            <div class="bg-zinc-900 rounded-2xl p-10 text-center shadow-2xl w-72">
                 <div class="text-7xl mb-4">🍽</div>
                 <p class="text-red-400 font-semibold text-lg">Múltiples dark kitchens</p>
                 <p class="text-gray-400 text-sm mt-1">Un solo pedido, un solo delivery</p>
@@ -66,27 +66,27 @@
 </section>
 
 {{-- Cómo funciona --}}
-<section class="py-16 bg-gray-800">
+<section class="py-16 bg-zinc-900">
     <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-3xl font-bold text-center text-white mb-4">¿Cómo funciona?</h2>
         <p class="text-center text-gray-500 mb-12">De la cocina a tu puerta en simples pasos</p>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div class="text-center p-6 bg-gray-900 rounded-2xl">
+            <div class="text-center p-6 bg-zinc-950 rounded-2xl">
                 <div class="text-5xl mb-4">🏪</div>
                 <h3 class="text-lg font-semibold mb-2">1. Elige tu cocina</h3>
                 <p class="text-gray-500 text-sm">Explorá las distintas dark kitchens y sus especialidades.</p>
             </div>
-            <div class="text-center p-6 bg-gray-900 rounded-2xl">
+            <div class="text-center p-6 bg-zinc-950 rounded-2xl">
                 <div class="text-5xl mb-4">🛒</div>
                 <h3 class="text-lg font-semibold mb-2">2. Armás tu pedido</h3>
                 <p class="text-gray-500 text-sm">Selecciona los platos que quieres y confirma el pedido.</p>
             </div>
-            <div class="text-center p-6 bg-gray-900 rounded-2xl">
+            <div class="text-center p-6 bg-zinc-950 rounded-2xl">
                 <div class="text-5xl mb-4">👨‍🍳</div>
                 <h3 class="text-lg font-semibold mb-2">3. La cocina prepara</h3>
                 <p class="text-gray-500 text-sm">El equipo de cocina recibe y prepara tu orden.</p>
             </div>
-            <div class="text-center p-6 bg-gray-900 rounded-2xl">
+            <div class="text-center p-6 bg-zinc-950 rounded-2xl">
                 <div class="text-5xl mb-4">🛵</div>
                 <h3 class="text-lg font-semibold mb-2">4. Lo recibís</h3>
                 <p class="text-gray-500 text-sm">El repartidor lleva tu pedido directo a tu domicilio.</p>
@@ -97,7 +97,7 @@
 
 {{-- Restaurantes destacados --}}
 @if($restaurants->count())
-<section class="py-16 bg-gray-900">
+<section class="py-16 bg-zinc-950">
     <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-3xl font-bold text-center text-white mb-4">Restaurantes destacados</h2>
         <p class="text-center text-gray-500 mb-12">Conocé nuestras dark kitchens disponibles</p>
@@ -107,24 +107,24 @@
             @php
                 $texto = strtolower($restaurant->name . ' ' . $restaurant->description);
                 if (str_contains($texto, 'burger') || str_contains($texto, 'hamburgues')) {
-                    $emoji = '🍔'; $gradiente = 'from-orange-900 via-gray-800 to-gray-800';
+                    $emoji = '🍔'; $gradiente = 'from-orange-900 via-zinc-900 to-zinc-900';
                 } elseif (str_contains($texto, 'pizza')) {
-                    $emoji = '🍕'; $gradiente = 'from-red-900 via-gray-800 to-gray-800';
+                    $emoji = '🍕'; $gradiente = 'from-red-900 via-zinc-900 to-zinc-900';
                 } elseif (str_contains($texto, 'ramen') || str_contains($texto, 'noodle') || str_contains($texto, 'asiat')) {
-                    $emoji = '🍜'; $gradiente = 'from-yellow-900 via-gray-800 to-gray-800';
+                    $emoji = '🍜'; $gradiente = 'from-yellow-900 via-zinc-900 to-zinc-900';
                 } elseif (str_contains($texto, 'taco') || str_contains($texto, 'mexic') || str_contains($texto, 'burrito')) {
-                    $emoji = '🌮'; $gradiente = 'from-green-900 via-gray-800 to-gray-800';
+                    $emoji = '🌮'; $gradiente = 'from-green-900 via-zinc-900 to-zinc-900';
                 } elseif (str_contains($texto, 'sushi') || str_contains($texto, 'japan')) {
-                    $emoji = '🍣'; $gradiente = 'from-pink-900 via-gray-800 to-gray-800';
+                    $emoji = '🍣'; $gradiente = 'from-pink-900 via-zinc-900 to-zinc-900';
                 } elseif (str_contains($texto, 'pollo') || str_contains($texto, 'chicken')) {
-                    $emoji = '🍗'; $gradiente = 'from-amber-900 via-gray-800 to-gray-800';
+                    $emoji = '🍗'; $gradiente = 'from-amber-900 via-zinc-900 to-zinc-900';
                 } elseif (str_contains($texto, 'ensalada') || str_contains($texto, 'vegano') || str_contains($texto, 'saludable')) {
-                    $emoji = '🥗'; $gradiente = 'from-emerald-900 via-gray-800 to-gray-800';
+                    $emoji = '🥗'; $gradiente = 'from-emerald-900 via-zinc-900 to-zinc-900';
                 } else {
-                    $emoji = '🍽️'; $gradiente = 'from-gray-700 via-gray-800 to-gray-800';
+                    $emoji = '🍽️'; $gradiente = 'from-gray-700 via-zinc-900 to-zinc-900';
                 }
             @endphp
-            <div class="bg-gray-800 rounded-2xl shadow-md overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-200 group">
+            <div class="bg-zinc-900 rounded-2xl shadow-md overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-200 group">
                 <div class="h-44 bg-gradient-to-br {{ $gradiente }} flex items-center justify-center relative overflow-hidden">
                     <span class="text-8xl drop-shadow-lg group-hover:scale-110 transition-transform duration-300">{{ $emoji }}</span>
                     <div class="absolute inset-0 bg-black/10"></div>
@@ -152,7 +152,7 @@
         </div>
 
         <div class="text-center mt-10">
-            <a href="{{ route('menu') }}" class="bg-gray-900 hover:bg-gray-700 text-white font-semibold px-8 py-3 rounded-xl transition">
+            <a href="{{ route('menu') }}" class="bg-zinc-950 hover:bg-zinc-800 text-white font-semibold px-8 py-3 rounded-xl transition">
                 Ver todos los restaurantes
             </a>
         </div>
@@ -161,27 +161,27 @@
 @endif
 
 {{-- Roles informativos --}}
-<section class="py-16 bg-gray-900 text-white">
+<section class="py-16 bg-zinc-950 text-white">
     <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-3xl font-bold text-center mb-4">Una plataforma, múltiples roles</h2>
         <p class="text-center text-gray-400 mb-12">EatHidden conecta a todos los actores del ecosistema dark kitchen</p>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-gray-800 rounded-2xl p-6 text-center">
+            <div class="bg-zinc-900 rounded-2xl p-6 text-center">
                 <div class="text-4xl mb-3">⚙️</div>
                 <h3 class="font-semibold text-red-400 mb-2">Administrador</h3>
                 <p class="text-gray-400 text-sm">Gestiona restaurantes, menú, usuarios y categorías.</p>
             </div>
-            <div class="bg-gray-800 rounded-2xl p-6 text-center">
+            <div class="bg-zinc-900 rounded-2xl p-6 text-center">
                 <div class="text-4xl mb-3">👨‍🍳</div>
                 <h3 class="font-semibold text-red-400 mb-2">Personal de cocina</h3>
                 <p class="text-gray-400 text-sm">Recibe pedidos y actualiza su estado en tiempo real.</p>
             </div>
-            <div class="bg-gray-800 rounded-2xl p-6 text-center">
+            <div class="bg-zinc-900 rounded-2xl p-6 text-center">
                 <div class="text-4xl mb-3">📱</div>
                 <h3 class="font-semibold text-red-400 mb-2">Cliente</h3>
                 <p class="text-gray-400 text-sm">Elige su dark kitchen, hace pedidos y hace seguimiento.</p>
             </div>
-            <div class="bg-gray-800 rounded-2xl p-6 text-center">
+            <div class="bg-zinc-900 rounded-2xl p-6 text-center">
                 <div class="text-4xl mb-3">🛵</div>
                 <h3 class="font-semibold text-red-400 mb-2">Repartidor</h3>
                 <p class="text-gray-400 text-sm">Elige sus entregas y las gestiona hasta la puerta.</p>
@@ -197,11 +197,11 @@
         <p class="text-red-100 mb-8">Creá tu cuenta y hacé tu primer pedido en minutos.</p>
         <div class="flex flex-wrap justify-center gap-4">
             @auth
-                <a href="{{ route('orders.restaurants') }}" class="bg-gray-800 text-red-400 hover:bg-gray-700 font-bold px-8 py-3 rounded-xl transition">
+                <a href="{{ route('orders.restaurants') }}" class="bg-zinc-900 text-red-400 hover:bg-zinc-800 font-bold px-8 py-3 rounded-xl transition">
                     Elegir restaurante
                 </a>
             @else
-                <a href="{{ route('register') }}" class="bg-gray-800 text-red-400 hover:bg-gray-700 font-bold px-8 py-3 rounded-xl transition">
+                <a href="{{ route('register') }}" class="bg-zinc-900 text-red-400 hover:bg-zinc-800 font-bold px-8 py-3 rounded-xl transition">
                     Crear cuenta gratis
                 </a>
                 <a href="{{ route('login') }}" class="border-2 border-white hover:bg-red-600 font-bold px-8 py-3 rounded-xl transition">

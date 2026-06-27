@@ -16,7 +16,7 @@
                     </svg>
                 </div>
                 <input type="text" name="name" value="{{ old('name') }}" required autofocus
-                    class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 placeholder-gray-600 @error('name') border-red-500 @enderror"
+                    class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 placeholder-gray-600 @error('name') border-red-500 @enderror"
                     placeholder="Tu nombre">
             </div>
             @error('name')
@@ -33,7 +33,7 @@
                     </svg>
                 </div>
                 <input type="email" name="email" value="{{ old('email') }}" required
-                    class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 placeholder-gray-600 @error('email') border-red-500 @enderror"
+                    class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 placeholder-gray-600 @error('email') border-red-500 @enderror"
                     placeholder="tucorreo@ejemplo.com">
             </div>
             @error('email')
@@ -50,7 +50,7 @@
                     </svg>
                 </div>
                 <input type="password" name="password" required
-                    class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 @error('password') border-red-500 @enderror"
+                    class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 @error('password') border-red-500 @enderror"
                     placeholder="Mínimo 8 caracteres">
             </div>
             @error('password')
@@ -67,7 +67,7 @@
                     </svg>
                 </div>
                 <input type="password" name="password_confirmation" required
-                    class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                    class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
                     placeholder="Repite tu contraseña">
             </div>
         </div>

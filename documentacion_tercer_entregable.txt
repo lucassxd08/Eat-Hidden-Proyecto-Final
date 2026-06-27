@@ -201,22 +201,38 @@ Flujo del proceso:
     Actualiza el pedido: $order->update(['status' => $request->status]).
     Redirige de vuelta a la misma página con mensaje de confirmación.
 
+  updatePaymentStatus(Request $request, Order $order)
+    Solo aplica a pedidos pagados con Yape.
+    Valida que el estado de pago sea: Pendiente, Pagado o Rechazado.
+    Si el pago se marca como "Pagado", el pedido pasa automáticamente a "confirmed".
+    Si se marca como "Rechazado", el pedido pasa a "cancelled".
+    Ruta: PATCH /admin/orders/{order}/payment-status
+
 ¿Los pedidos entregados/cancelados no se pueden cambiar?
   Sí. En la vista, los pedidos con estado "delivered" o "cancelled" muestran
   un guión "—" en vez del selector, para no permitir cambios sobre pedidos finales.
 
 Escenarios de prueba del proceso secundario:
 
-  Escenario A — Administrador gestiona el pedido:
+  Escenario A — Administrador gestiona pedido con Yape:
     1. Iniciar sesión con cliente@eathidden.com / password
-    2. Ir a /pedir, elegir restaurante, hacer un pedido
-    3. Cerrar sesión
-    4. Iniciar sesión con admin@eathidden.com / password
-    5. Ir a Administración > Pedidos (o /admin/orders)
-    6. Ver el pedido recién creado en estado "Pendiente"
-    7. Cambiar el estado a "Confirmado" → "Preparando" → "Listo" → "En camino" → "Entregado"
+    2. Ir a /pedir, elegir restaurante, agregar platos
+    3. Seleccionar método de pago "Yape", escanear QR y confirmar pedido
+    4. Cerrar sesión
+    5. Iniciar sesión con admin@eathidden.com / password
+    6. Ir a Administración > Pedidos (o /admin/orders)
+    7. Ver el pedido con estado "Pendiente" y pago Yape "Pendiente"
+    8. Confirmar el pago Yape → el pedido pasa automáticamente a "Confirmado"
+    9. Continuar actualizando: "Preparando" → "Listo" → "En camino" → "Entregado"
 
-  Escenario B — Pedido ya existe (datos del seeder):
+  Escenario B — Administrador gestiona pedido con tarjeta:
+    1. Iniciar sesión con cliente@eathidden.com / password
+    2. Ir a /pedir, elegir restaurante, seleccionar método "Tarjeta"
+    3. Ingresar datos de tarjeta y realizar pedido
+    4. Iniciar sesión con admin@eathidden.com / password
+    5. En /admin/orders cambiar el estado del pedido manualmente
+
+  Escenario C — Pedido ya existe (datos del seeder):
     1. Iniciar sesión con admin@eathidden.com / password
     2. Ir a /admin/orders
     3. Ya aparece un pedido de prueba en estado "Preparando" (creado por el seeder)
@@ -236,7 +252,9 @@ El proyecto sigue la arquitectura MVC de Laravel (Modelo - Vista - Controlador).
     Dish.php         — Plato. Relaciones belongsTo Restaurant y Category,
                        hasMany OrderItem.
     Order.php        — Pedido. Relaciones: belongsTo User (como cliente),
-                       hasMany OrderItem.
+                       hasMany OrderItem. Campos de pago: metodo_pago
+                       (Card/Yape), estado_pago (Pendiente/Pagado/Rechazado),
+                       fecha_pago.
     OrderItem.php    — Ítem de pedido. belongsTo Order y Dish.
 
   CONTROLADORES (app/Http/Controllers/)
@@ -275,7 +293,9 @@ El proyecto sigue la arquitectura MVC de Laravel (Modelo - Vista - Controlador).
     auth/login.blade.php       — Formulario de inicio de sesión.
     auth/register.blade.php    — Formulario de registro.
     admin/                     — Todas las vistas de administración.
-    orders/                    — Flujo de pedido del cliente.
+    orders/                    — Flujo de pedido del cliente. Incluye
+                                 selección de método de pago (tarjeta o Yape
+                                 con QR), y vista de detalle con estado de pago.
     kitchen/                   — Vista del personal de cocina.
     delivery/                  — Vista del repartidor.
 

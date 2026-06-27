@@ -25,7 +25,7 @@
         </div>
     </div>
 
-    <div class="bg-gray-900 text-white rounded-2xl p-10 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+    <div class="bg-zinc-950 text-white rounded-2xl p-10 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
         <div>
             <p class="text-5xl font-bold text-red-400 mb-2">100%</p>
             <p class="text-gray-300">Enfoque en delivery</p>

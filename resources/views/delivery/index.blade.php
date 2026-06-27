@@ -17,9 +17,9 @@
             'ready'      => ['bg-green-900 text-green-300', 'border-green-400'],
             'delivering' => ['bg-indigo-900 text-indigo-300', 'border-indigo-400'],
         ];
-        [$badgeColor, $borderColor] = $colorMap[$order->status] ?? ['bg-gray-800 text-gray-400', 'border-gray-600'];
+        [$badgeColor, $borderColor] = $colorMap[$order->status] ?? ['bg-zinc-900 text-gray-400', 'border-zinc-700'];
     @endphp
-    <div class="bg-gray-800 rounded-2xl shadow mb-6 border-l-4 {{ $borderColor }} overflow-hidden">
+    <div class="bg-zinc-900 rounded-2xl shadow mb-6 border-l-4 {{ $borderColor }} overflow-hidden">
         <div class="p-6">
             <div class="flex items-start justify-between flex-wrap gap-4">
                 <div>

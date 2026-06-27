@@ -22,7 +22,7 @@
             'cancelled'  => 'bg-red-900 text-red-300',
         ];
     @endphp
-    <div class="bg-gray-800 rounded-2xl shadow mb-4 p-6 flex items-center justify-between">
+    <div class="bg-zinc-900 rounded-2xl shadow mb-4 p-6 flex items-center justify-between">
         <div>
             <p class="font-bold text-white">Pedido #{{ $order->id }}</p>
             <p class="text-gray-500 text-sm mt-1">{{ $order->created_at->format('d/m/Y H:i') }}</p>
@@ -30,7 +30,7 @@
         </div>
         <div class="text-right">
             <p class="font-bold text-red-500 text-lg">S/ {{ number_format($order->total, 2) }}</p>
-            <span class="inline-block mt-1 px-3 py-1 rounded-full text-xs font-semibold {{ $statusColors[$order->status] ?? 'bg-gray-800 text-gray-400' }}">
+            <span class="inline-block mt-1 px-3 py-1 rounded-full text-xs font-semibold {{ $statusColors[$order->status] ?? 'bg-zinc-900 text-gray-400' }}">
                 {{ $order->status_label }}
             </span>
             <div class="mt-2">

@@ -18,9 +18,9 @@
         <div class="bg-red-900 border border-red-700 text-red-300 px-4 py-3 rounded-lg mb-4 text-sm">{{ session('error') }}</div>
     @endif
 
-    <div class="bg-gray-800 rounded-xl shadow overflow-hidden">
+    <div class="bg-zinc-900 rounded-xl shadow overflow-hidden">
         <table class="w-full text-sm">
-            <thead class="bg-gray-900 text-gray-400 uppercase text-xs">
+            <thead class="bg-zinc-950 text-gray-400 uppercase text-xs">
                 <tr>
                     <th class="px-6 py-3 text-left">Nombre</th>
                     <th class="px-6 py-3 text-left">Descripción</th>
@@ -29,9 +29,9 @@
                     <th class="px-6 py-3 text-center">Acciones</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-700">
+            <tbody class="divide-y divide-zinc-800">
                 @forelse($restaurants as $restaurant)
-                <tr class="hover:bg-gray-700">
+                <tr class="hover:bg-zinc-800">
                     <td class="px-6 py-4 font-semibold text-white">{{ $restaurant->name }}</td>
                     <td class="px-6 py-4 text-gray-500">{{ Str::limit($restaurant->description, 50) }}</td>
                     <td class="px-6 py-4 text-center">{{ $restaurant->dishes_count }}</td>

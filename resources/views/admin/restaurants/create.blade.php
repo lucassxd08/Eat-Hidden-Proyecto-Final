@@ -5,20 +5,20 @@
 <div class="max-w-2xl mx-auto px-4 py-8">
     <h1 class="text-2xl font-bold text-white mb-6">Nuevo Restaurante</h1>
 
-    <form action="{{ route('admin.restaurants.store') }}" method="POST" class="bg-gray-800 rounded-xl shadow p-6 space-y-5">
+    <form action="{{ route('admin.restaurants.store') }}" method="POST" class="bg-zinc-900 rounded-xl shadow p-6 space-y-5">
         @csrf
 
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Nombre *</label>
             <input type="text" name="name" value="{{ old('name') }}" required
-                   class="w-full border border-gray-600 rounded-lg px-3 py-2 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-red-400">
+                   class="w-full border border-zinc-700 rounded-lg px-3 py-2 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-400">
             @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
         </div>
 
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Descripción</label>
             <textarea name="description" rows="3"
-                      class="w-full border border-gray-600 rounded-lg px-3 py-2 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-red-400">{{ old('description') }}</textarea>
+                      class="w-full border border-zinc-700 rounded-lg px-3 py-2 bg-zinc-950 text-white focus:outline-none focus:ring-2 focus:ring-red-400">{{ old('description') }}</textarea>
             @error('description')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
         </div>
 
@@ -34,7 +34,7 @@
                 Guardar
             </button>
             <a href="{{ route('admin.restaurants.index') }}"
-               class="bg-gray-700 hover:bg-gray-600 text-gray-300 px-6 py-2 rounded-lg font-semibold">
+               class="bg-zinc-800 hover:bg-zinc-700 text-gray-300 px-6 py-2 rounded-lg font-semibold">
                 Cancelar
             </a>
         </div>

@@ -13,9 +13,9 @@
         </a>
     </div>
 
-    <div class="bg-gray-800 rounded-2xl shadow overflow-hidden">
+    <div class="bg-zinc-900 rounded-2xl shadow overflow-hidden">
         <table class="w-full text-sm">
-            <thead class="bg-gray-800 text-gray-400 uppercase text-xs">
+            <thead class="bg-zinc-900 text-gray-400 uppercase text-xs">
                 <tr>
                     <th class="px-6 py-4 text-left">Nombre</th>
                     <th class="px-6 py-4 text-left">Categoría</th>
@@ -25,9 +25,9 @@
                     <th class="px-6 py-4 text-center">Acciones</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-700">
+            <tbody class="divide-y divide-zinc-800">
                 @forelse($dishes as $dish)
-                <tr class="hover:bg-gray-700">
+                <tr class="hover:bg-zinc-800">
                     <td class="px-6 py-4 font-medium text-white">{{ $dish->name }}</td>
                     <td class="px-6 py-4 text-gray-400">{{ $dish->category->name }}</td>
                     <td class="px-6 py-4 text-gray-500 max-w-xs truncate">{{ $dish->description ?? '—' }}</td>
@@ -36,7 +36,7 @@
                         @if($dish->available)
                             <span class="bg-green-900 text-green-300 text-xs font-semibold px-2.5 py-1 rounded-full">Disponible</span>
                         @else
-                            <span class="bg-gray-800 text-gray-500 text-xs font-semibold px-2.5 py-1 rounded-full">No disponible</span>
+                            <span class="bg-zinc-900 text-gray-500 text-xs font-semibold px-2.5 py-1 rounded-full">No disponible</span>
                         @endif
                     </td>
                     <td class="px-6 py-4 text-center">

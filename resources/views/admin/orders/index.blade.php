@@ -13,9 +13,9 @@
             <p class="text-xl">No hay pedidos registrados.</p>
         </div>
     @else
-    <div class="bg-gray-800 rounded-xl shadow overflow-hidden">
+    <div class="bg-zinc-900 rounded-xl shadow overflow-hidden">
         <table class="w-full text-sm">
-            <thead class="bg-gray-900 text-gray-400 uppercase text-xs">
+            <thead class="bg-zinc-950 text-gray-400 uppercase text-xs">
                 <tr>
                     <th class="px-6 py-4 text-left">Pedido</th>
                     <th class="px-6 py-4 text-left">Cliente</th>
@@ -26,7 +26,7 @@
                     <th class="px-6 py-4 text-center">Actualizar</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-700">
+            <tbody class="divide-y divide-zinc-800">
                 @foreach($orders as $order)
                 @php
                     $statusColors = [
@@ -39,7 +39,7 @@
                         'cancelled'  => 'bg-red-900 text-red-300',
                     ];
                 @endphp
-                <tr class="hover:bg-gray-700">
+                <tr class="hover:bg-zinc-800">
                     <td class="px-6 py-4">
                         <p class="font-semibold text-white">#{{ $order->id }}</p>
                         <p class="text-gray-500 text-xs">{{ $order->created_at->format('d/m/Y H:i') }}</p>
@@ -65,7 +65,7 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 text-center">
-                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold {{ $statusColors[$order->status] ?? 'bg-gray-700 text-gray-300' }}">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold {{ $statusColors[$order->status] ?? 'bg-zinc-800 text-gray-300' }}">
                             {{ $order->status_label }}
                         </span>
                     </td>
@@ -74,7 +74,7 @@
                             @if(!in_array($order->status, ['delivered', 'cancelled']))
                             <form method="POST" action="{{ route('admin.orders.update-status', $order) }}" class="flex items-center justify-center gap-2">
                                 @csrf @method('PATCH')
-                                <select name="status" class="border border-gray-600 rounded-lg px-2 py-1 bg-gray-900 text-white text-xs focus:outline-none focus:ring-1 focus:ring-red-500">
+                                <select name="status" class="border border-zinc-700 rounded-lg px-2 py-1 bg-zinc-950 text-white text-xs focus:outline-none focus:ring-1 focus:ring-red-500">
                                     <option value="pending"    {{ $order->status === 'pending'    ? 'selected' : '' }}>Pendiente</option>
                                     <option value="confirmed"  {{ $order->status === 'confirmed'  ? 'selected' : '' }}>Confirmado</option>
                                     <option value="preparing"  {{ $order->status === 'preparing'  ? 'selected' : '' }}>Preparando</option>
@@ -94,12 +94,12 @@
                             @if($order->metodo_pago === 'Yape')
                             <form method="POST" action="{{ route('admin.orders.update-payment-status', $order) }}" class="flex items-center justify-center gap-2">
                                 @csrf @method('PATCH')
-                                <select name="estado_pago" class="border border-gray-600 rounded-lg px-2 py-1 bg-gray-900 text-white text-xs focus:outline-none focus:ring-1 focus:ring-red-500">
+                                <select name="estado_pago" class="border border-zinc-700 rounded-lg px-2 py-1 bg-zinc-950 text-white text-xs focus:outline-none focus:ring-1 focus:ring-red-500">
                                     <option value="Pendiente" {{ $order->estado_pago === 'Pendiente' ? 'selected' : '' }}>Pendiente</option>
                                     <option value="Pagado" {{ $order->estado_pago === 'Pagado' ? 'selected' : '' }}>Pagado</option>
                                     <option value="Rechazado" {{ $order->estado_pago === 'Rechazado' ? 'selected' : '' }}>Rechazado</option>
                                 </select>
-                                <button type="submit" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                                <button type="submit" class="bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
                                     Pago
                                 </button>
                             </form>

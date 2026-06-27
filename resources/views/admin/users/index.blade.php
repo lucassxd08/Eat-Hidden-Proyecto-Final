@@ -13,9 +13,9 @@
         </a>
     </div>
 
-    <div class="bg-gray-800 rounded-2xl shadow overflow-hidden">
+    <div class="bg-zinc-900 rounded-2xl shadow overflow-hidden">
         <table class="w-full text-sm">
-            <thead class="bg-gray-800 text-gray-400 uppercase text-xs">
+            <thead class="bg-zinc-900 text-gray-400 uppercase text-xs">
                 <tr>
                     <th class="px-6 py-4 text-left">Nombre</th>
                     <th class="px-6 py-4 text-left">Email</th>
@@ -24,9 +24,9 @@
                     <th class="px-6 py-4 text-center">Acciones</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-700">
+            <tbody class="divide-y divide-zinc-800">
                 @forelse($users as $user)
-                <tr class="hover:bg-gray-700">
+                <tr class="hover:bg-zinc-800">
                     <td class="px-6 py-4 font-medium text-white">{{ $user->name }}</td>
                     <td class="px-6 py-4 text-gray-400">{{ $user->email }}</td>
                     <td class="px-6 py-4">
@@ -44,7 +44,7 @@
                                 'client'   => 'Cliente',
                             ];
                         @endphp
-                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold {{ $roleColors[$user->role] ?? 'bg-gray-800 text-gray-400' }}">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold {{ $roleColors[$user->role] ?? 'bg-zinc-900 text-gray-400' }}">
                             {{ $roleLabels[$user->role] ?? $user->role }}
                         </span>
                     </td>

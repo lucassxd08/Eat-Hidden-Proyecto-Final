@@ -8,7 +8,7 @@
         <h1 class="text-3xl font-bold text-white mt-2">Pedido #{{ $order->id }}</h1>
     </div>
 
-    <div class="bg-gray-800 rounded-2xl shadow p-8 space-y-6">
+    <div class="bg-zinc-900 rounded-2xl shadow p-8 space-y-6">
         {{-- Estado --}}
         <div class="flex items-center justify-between">
             <div>
@@ -26,12 +26,12 @@
                     'cancelled'  => 'bg-red-900 text-red-300',
                 ];
             @endphp
-            <span class="px-4 py-2 rounded-full text-sm font-semibold {{ $statusColors[$order->status] ?? 'bg-gray-800 text-gray-400' }}">
+            <span class="px-4 py-2 rounded-full text-sm font-semibold {{ $statusColors[$order->status] ?? 'bg-zinc-900 text-gray-400' }}">
                 {{ $order->status_label }}
             </span>
         </div>
 
-        <hr>
+        <hr class="border-zinc-700">
 
         {{-- Detalles --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
@@ -57,12 +57,12 @@
             @endif
         </div>
 
-        <hr>
+        <hr class="border-zinc-700">
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div>
                 <p class="text-gray-500">Método de pago</p>
-                <p class="font-medium">{{ $order->metodo_pago === 'Yape' ? 'Yape' : 'Tarjeta' }}</p>
+                <p class="font-medium">{{ $order->metodo_pago ?? 'Efectivo' }}</p>
             </div>
             @if($order->metodo_pago === 'Yape')
             <div>
@@ -72,13 +72,13 @@
             @endif
         </div>
 
-        <hr>
+        <hr class="border-zinc-700">
 
         {{-- Items --}}
         <div>
             <h2 class="font-bold text-white mb-3">Detalle del pedido</h2>
             <table class="w-full text-sm">
-                <thead class="text-gray-500 border-b">
+                <thead class="text-gray-500 border-b border-zinc-700">
                     <tr>
                         <th class="pb-2 text-left">Plato</th>
                         <th class="pb-2 text-center">Cant.</th>
@@ -86,7 +86,7 @@
                         <th class="pb-2 text-right">Subtotal</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-700">
+                <tbody class="divide-y divide-zinc-800">
                     @foreach($order->items as $item)
                     <tr>
                         <td class="py-2">{{ $item->dish->name }}</td>

@@ -30,11 +30,11 @@
                 } elseif (str_contains($texto, 'pollo') || str_contains($texto, 'chicken')) {
                     $emoji = '🍗'; $bg = 'bg-amber-900';
                 } else {
-                    $emoji = '🍽️'; $bg = 'bg-gray-700';
+                    $emoji = '🍽️'; $bg = 'bg-zinc-800';
                 }
             @endphp
             <a href="{{ route('orders.menu', $restaurant) }}"
-               class="bg-gray-800 rounded-xl shadow hover:shadow-lg transition-all hover:scale-[1.02] p-6 flex flex-col gap-3 border border-gray-700 hover:border-red-500 group">
+               class="bg-zinc-900 rounded-xl shadow hover:shadow-lg transition-all hover:scale-[1.02] p-6 flex flex-col gap-3 border border-zinc-700 hover:border-red-500 group">
                 <div class="w-16 h-16 {{ $bg }} rounded-full flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
                     {{ $emoji }}
                 </div>
@@ -44,7 +44,7 @@
                         <p class="text-sm text-gray-500 mt-1">{{ Str::limit($restaurant->description, 80) }}</p>
                     @endif
                 </div>
-                <div class="flex items-center justify-between mt-auto pt-3 border-t border-gray-700">
+                <div class="flex items-center justify-between mt-auto pt-3 border-t border-zinc-700">
                     <span class="text-sm text-gray-400">{{ $restaurant->dishes_count }} platos disponibles</span>
                     <span class="text-red-500 font-semibold text-sm">Ver menú →</span>
                 </div>

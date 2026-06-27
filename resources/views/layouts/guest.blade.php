@@ -9,10 +9,10 @@
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-gray-950">
+<body class="font-sans antialiased bg-black">
 <div class="min-h-screen flex">
 
-    <div class="hidden lg:flex lg:w-1/2 bg-gray-950 flex-col justify-between p-12 relative overflow-hidden border-r border-gray-800">
+    <div class="hidden lg:flex lg:w-1/2 bg-black flex-col justify-between p-12 relative overflow-hidden border-r border-zinc-800">
         <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0); background-size: 32px 32px;"></div>
         <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-red-500 rounded-full opacity-10 blur-3xl"></div>
 
@@ -50,7 +50,7 @@
         </div>
     </div>
 
-    <div class="w-full lg:w-1/2 bg-gray-900 flex items-center justify-center p-8">
+    <div class="w-full lg:w-1/2 bg-zinc-950 flex items-center justify-center p-8">
         <div class="w-full max-w-md">
             <div class="lg:hidden flex items-center gap-3 mb-8">
                 <div class="w-9 h-9 bg-red-500 rounded-xl flex items-center justify-center text-lg">🍔</div>
