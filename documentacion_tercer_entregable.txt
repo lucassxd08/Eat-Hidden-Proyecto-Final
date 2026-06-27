@@ -1,0 +1,331 @@
+  EAT HIDDEN — DOCUMENTACIÓN TERCER ENTREGABLE
+  Aplicación web de delivery para dark kitchens | Laravel 12
+
+1. LOS 3 CRUDs DEL PROYECTO
+
+
+El proyecto tiene 3 integrantes, por lo tanto se presentan 3 CRUDs completos.
+Ninguno es sobre la tabla de usuarios ni perfiles. Todos solo los puede acceder
+el administrador.
+
+Las rutas de los 3 CRUDs están definidas en:
+  Archivo: routes/web.php (líneas 39–46)
+
+  Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+      Route::resource('categories', CategoryController::class);
+      Route::resource('dishes', DishController::class);
+      Route::resource('restaurants', RestaurantController::class);
+      ...
+  });
+
+  "Route::resource" genera automáticamente las 7 rutas del CRUD:
+  index, create, store, show, edit, update, destroy.
+  El middleware 'role:admin' bloquea el acceso a cualquier usuario que no sea admin.
+
+
+----------------------------------------
+CRUD 1: RESTAURANTES (Dark Kitchens)
+----------------------------------------
+URL base:       /admin/restaurants
+Controlador:    app/Http/Controllers/Admin/RestaurantController.php
+Vistas:         resources/views/admin/restaurants/
+                  - index.blade.php  (listado)
+                  - create.blade.php (formulario nuevo)
+                  - edit.blade.php   (formulario editar)
+Modelo:         app/Models/Restaurant.php
+
+¿Qué hace cada método del controlador?
+
+  index()
+    Obtiene todos los restaurantes con el conteo de platos que tiene cada uno
+    usando "withCount('dishes')". Envía los datos a la vista del listado.
+
+  create()
+    Solo devuelve la vista con el formulario vacío para crear un restaurante.
+
+  store(Request $request)
+    Valida que el nombre sea obligatorio y máximo 255 caracteres.
+    Crea el registro en la base de datos con Restaurant::create().
+    Redirige al listado con mensaje de éxito.
+
+  edit(Restaurant $restaurant)
+    Laravel busca automáticamente el restaurante por su ID en la URL
+    (esto se llama Route Model Binding). Devuelve la vista con los datos cargados.
+
+  update(Request $request, Restaurant $restaurant)
+    Valida igual que store, luego actualiza el registro con $restaurant->update().
+
+  destroy(Restaurant $restaurant)
+    Antes de eliminar, verifica si el restaurante tiene platos:
+      if ($restaurant->dishes()->count() > 0) → retorna error.
+    Así se evitan errores de integridad referencial en la base de datos.
+    Si no tiene platos, lo elimina con $restaurant->delete().
+
+¿Cómo se muestra el nombre y no el ID de la foreign key?
+  En la vista del listado de PLATOS, la columna "Restaurante" muestra
+  $dish->restaurant->name  (no el restaurant_id numérico).
+  Esto funciona gracias a la relación definida en el modelo Dish:
+    public function restaurant() { return $this->belongsTo(Restaurant::class); }
+
+
+----------------------------------------
+CRUD 2: PLATOS
+----------------------------------------
+URL base:       /admin/dishes
+Controlador:    app/Http/Controllers/Admin/DishController.php
+Vistas:         resources/views/admin/dishes/
+                  - index.blade.php  (listado con categoría y restaurante)
+                  - create.blade.php (formulario nuevo)
+                  - edit.blade.php   (formulario editar)
+Modelo:         app/Models/Dish.php
+
+¿Qué hace cada método del controlador?
+
+  index()
+    Carga todos los platos junto con su categoría y restaurante usando
+    Dish::with('category', 'restaurant'). El "with()" evita el problema
+    N+1 (consultas repetidas) cargando todo en una sola query.
+
+  create()
+    Carga las categorías activas y restaurantes activos para mostrarlos
+    como opciones en los selectores del formulario. Envía los datos a la vista.
+
+  store(Request $request)
+    Valida: restaurante y categoría deben existir en sus tablas (exists:tabla,id),
+    nombre obligatorio, precio numérico positivo, imagen opcional (máx 2MB).
+    Si hay imagen, se guarda en storage/app/public/dishes/ con ->store().
+    Crea el plato con Dish::create($data).
+
+  edit(Dish $dish)
+    Route Model Binding busca el plato por ID. Carga también categorías y
+    restaurantes para rellenar los selectores del formulario de edición.
+
+  update(Request $request, Dish $dish)
+    Mismas validaciones que store. Si se sube imagen nueva, elimina la anterior
+    con Storage::disk('public')->delete($dish->image) y guarda la nueva.
+
+  destroy(Dish $dish)
+    Verifica si el plato tiene pedidos asociados:
+      if ($dish->orderItems()->count() > 0) → retorna error.
+    Si tiene imagen, la elimina del disco.
+    Luego elimina el registro con $dish->delete().
+
+¿Foreign keys con nombre, no con ID?
+  En el listado de platos se muestra:
+    $dish->category->name     (no category_id)
+    $dish->restaurant->name   (no restaurant_id)
+  En los formularios se muestran selectores con los nombres, pero el valor
+  enviado al servidor es el ID. Laravel valida que ese ID exista en la tabla.
+
+
+----------------------------------------
+CRUD 3: CATEGORÍAS
+----------------------------------------
+URL base:       /admin/categories
+Controlador:    app/Http/Controllers/Admin/CategoryController.php
+Vistas:         resources/views/admin/categories/
+                  - index.blade.php  (listado)
+                  - create.blade.php (formulario nuevo)
+                  - edit.blade.php   (formulario editar)
+Modelo:         app/Models/Category.php
+
+¿Qué hace cada método del controlador?
+
+  index()
+    Obtiene todas las categorías con el conteo de platos usando withCount('dishes').
+
+  create()
+    Devuelve la vista con el formulario vacío.
+
+  store(Request $request)
+    Valida: nombre obligatorio, único en la tabla ('unique:categories'),
+    descripción opcional, activo booleano.
+    Crea la categoría con Category::create($data).
+
+  edit(Category $category)
+    Route Model Binding busca la categoría. Devuelve la vista con datos.
+
+  update(Request $request, Category $category)
+    Valida el nombre como único excepto el registro actual:
+      'unique:categories,name,' . $category->id
+    Esto permite guardar sin cambiar el nombre sin que falle la validación.
+
+  destroy(Category $category)
+    Si la categoría tiene platos asignados retorna error de integridad.
+    Si no tiene, la elimina.
+
+¿Se muestran IDs?
+  No. En el listado de categorías solo se muestra nombre, descripción,
+  cantidad de platos y estado. Los IDs autogenerados nunca aparecen en pantalla.
+
+
+========================================
+2. PROCESO SECUNDARIO
+========================================
+
+El proceso secundario elegido es:
+  "Gestión del estado de todos los pedidos por parte del Administrador"
+
+URL:            /admin/orders
+Controlador:    app/Http/Controllers/Admin/OrderController.php
+Vista:          resources/views/admin/orders/index.blade.php
+
+Flujo del proceso:
+
+  1. El cliente hace un pedido desde /pedir/{restaurante}.
+     Se crea el pedido con estado "pending" (pendiente) en la base de datos.
+
+  2. El administrador entra a /admin/orders y ve todos los pedidos del sistema
+     con su estado actual, cliente, platos y total.
+
+  3. El administrador puede cambiar el estado de cualquier pedido usando el
+     selector de la tabla y presionando "OK". Los estados posibles son:
+       pending    → Pendiente
+       confirmed  → Confirmado
+       preparing  → Preparando
+       ready      → Listo
+       delivering → En camino
+       delivered  → Entregado
+       cancelled  → Cancelado
+
+¿Cómo funciona el código del controlador?
+
+  index()
+    Carga todos los pedidos con su cliente (relación client) y sus items
+    junto con el plato de cada item (relación items.dish).
+    Order::with('client', 'items.dish')->latest()->get()
+    "latest()" ordena del más reciente al más antiguo.
+
+  updateStatus(Request $request, Order $order)
+    Valida que el estado recibido sea uno de los 7 valores permitidos.
+    Actualiza el pedido: $order->update(['status' => $request->status]).
+    Redirige de vuelta a la misma página con mensaje de confirmación.
+
+¿Los pedidos entregados/cancelados no se pueden cambiar?
+  Sí. En la vista, los pedidos con estado "delivered" o "cancelled" muestran
+  un guión "—" en vez del selector, para no permitir cambios sobre pedidos finales.
+
+Escenarios de prueba del proceso secundario:
+
+  Escenario A — Administrador gestiona el pedido:
+    1. Iniciar sesión con cliente@eathidden.com / password
+    2. Ir a /pedir, elegir restaurante, hacer un pedido
+    3. Cerrar sesión
+    4. Iniciar sesión con admin@eathidden.com / password
+    5. Ir a Administración > Pedidos (o /admin/orders)
+    6. Ver el pedido recién creado en estado "Pendiente"
+    7. Cambiar el estado a "Confirmado" → "Preparando" → "Listo" → "En camino" → "Entregado"
+
+  Escenario B — Pedido ya existe (datos del seeder):
+    1. Iniciar sesión con admin@eathidden.com / password
+    2. Ir a /admin/orders
+    3. Ya aparece un pedido de prueba en estado "Preparando" (creado por el seeder)
+    4. Cambiar su estado directamente desde la tabla
+
+
+========================================
+3. DISTRIBUCIÓN DEL CÓDIGO
+========================================
+
+El proyecto sigue la arquitectura MVC de Laravel (Modelo - Vista - Controlador).
+
+  MODELOS (app/Models/)
+    User.php         — Usuario con campo "role" (admin/kitchen/client/delivery)
+    Restaurant.php   — Dark kitchen. Relación hasMany con Dish.
+    Category.php     — Categoría de platos. Relación hasMany con Dish.
+    Dish.php         — Plato. Relaciones belongsTo Restaurant y Category,
+                       hasMany OrderItem.
+    Order.php        — Pedido. Relaciones: belongsTo User (como cliente),
+                       hasMany OrderItem.
+    OrderItem.php    — Ítem de pedido. belongsTo Order y Dish.
+
+  CONTROLADORES (app/Http/Controllers/)
+    HomeController.php           — Página principal y menú público
+    OrderController.php          — Flujo de pedido del cliente
+    KitchenController.php        — Vista y acciones del personal de cocina
+    DeliveryController.php       — Vista y acciones del repartidor
+    ProfileController.php        — Edición de perfil (Breeze)
+
+    Admin/ (solo accesibles por administrador):
+      Admin/UserController.php         — CRUD de usuarios
+      Admin/RestaurantController.php   — CRUD de restaurantes
+      Admin/DishController.php         — CRUD de platos
+      Admin/CategoryController.php     — CRUD de categorías
+      Admin/OrderController.php        — Proceso secundario: gestión de pedidos
+
+  RUTAS (routes/web.php)
+    Agrupadas por rol con middleware:
+      Públicas              — sin middleware
+      ['auth', 'role:admin']    — solo administrador
+      ['auth', 'role:client,admin'] — cliente y admin
+      ['auth', 'role:kitchen,admin'] — cocina y admin
+      ['auth', 'role:delivery,admin'] — repartidor y admin
+
+  MIDDLEWARE PERSONALIZADO (app/Http/Middleware/CheckRole.php)
+    Registrado como alias "role" en bootstrap/app.php.
+    Verifica que el usuario autenticado tenga el rol requerido.
+    Si no cumple, redirige a la página principal.
+
+  VISTAS (resources/views/)
+    layouts/app.blade.php      — Layout principal: sidebar oscuro para autenticados,
+                                 navbar superior para visitantes públicos.
+    layouts/guest.blade.php    — Layout split para login/registro: panel izquierdo
+                                 con branding, panel derecho con formulario.
+    dashboard.blade.php        — Inicio del dashboard con estadísticas.
+    auth/login.blade.php       — Formulario de inicio de sesión.
+    auth/register.blade.php    — Formulario de registro.
+    admin/                     — Todas las vistas de administración.
+    orders/                    — Flujo de pedido del cliente.
+    kitchen/                   — Vista del personal de cocina.
+    delivery/                  — Vista del repartidor.
+
+  MIGRACIONES (database/migrations/)
+    Crean las tablas: users, restaurants, categories, dishes, orders, order_items.
+    Siguen convención de clases anónimas requerida por Laravel 12.
+
+  SEEDER (database/seeders/DatabaseSeeder.php)
+    Crea 4 usuarios (admin, cocina, cliente, repartidor), 4 restaurantes,
+    5 categorías, 12 platos y 1 pedido de prueba.
+    Se ejecuta con: php artisan migrate:fresh --seed --force
+
+
+========================================
+4. TECNOLOGÍAS Y EXTENSIONES USADAS
+========================================
+
+  - Laravel 12          Framework PHP principal (MVC, ORM Eloquent, Blade)
+  - Laravel Breeze      Starter Kit para autenticación (login, registro, rutas auth)
+  - Tailwind CSS v4     Framework CSS de utilidades (todo el diseño visual)
+  - Vite                Bundler para compilar CSS y JS (npm run build)
+  - MySQL               Base de datos relacional (via XAMPP)
+  - PHP 8.2+            Lenguaje de programación
+
+  Comandos para levantar el proyecto:
+    1. Iniciar MySQL desde XAMPP
+    2. php artisan serve        (levanta el servidor en http://127.0.0.1:8000)
+    3. (Si se necesita recompilar CSS): npm run build
+
+  Credenciales de prueba:
+    admin@eathidden.com   / password  → Administrador
+    cocina@eathidden.com  / password  → Personal de cocina
+    cliente@eathidden.com / password  → Cliente
+    delivery@eathidden.com / password → Repartidor
+
+
+========================================
+5. SUBSANACIÓN DE PROBLEMAS ANTERIORES
+========================================
+
+  Problema detectado en la segunda presentación:
+    Al intentar eliminar un usuario que tenía pedidos asociados, el sistema
+    lanzaba un error de integridad de base de datos (error 500).
+
+  Solución aplicada (Admin/UserController.php — método destroy):
+    Se agregó verificación previa:
+      if ($user->orders()->exists()) {
+          return back()->with('error', 'No se puede eliminar...');
+      }
+    Ahora el sistema muestra un mensaje de error amigable en vez de romperse.
+
+  También se corrigió el método authorize() que no estaba disponible:
+    Se agregó el trait AuthorizesRequests en el controlador base (Controller.php).
