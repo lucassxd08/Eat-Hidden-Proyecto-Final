@@ -349,3 +349,173 @@ El proyecto sigue la arquitectura MVC de Laravel (Modelo - Vista - Controlador).
 
   También se corrigió el método authorize() que no estaba disponible:
     Se agregó el trait AuthorizesRequests en el controlador base (Controller.php).
+
+
+========================================
+6. IMPLEMENTACIÓN DE YAPE Y COMPROBANTE
+========================================
+
+¿Qué es Yape?
+  Yape es un método de pago digital alternativo a las tarjetas de crédito.
+  En este proyecto, se implementó como una opción adicional en el flujo de compra.
+  Cuando un cliente selecciona Yape, el sistema genera un código QR para el pago,
+  y el administrador puede confirmar manualmente cuando recibe el pago.
+
+Flujo de pago con Yape:
+
+  1. Cliente elige Yape en el checkout
+     ↓
+  2. Sistema muestra código QR para escanear
+     ↓
+  3. Cliente confirma el pedido (estado: Pendiente, pago Yape: Pendiente)
+     ↓
+  4. Administrador recibe el pago
+     ↓
+  5. Administrador marca el pago como "Pagado" en /admin/orders
+     ↓
+  6. Sistema genera automáticamente el comprobante de pago
+     ↓
+  7. Pedido pasa automáticamente a estado "Confirmado"
+
+
+¿Dónde está implementado Yape en el código?
+
+  a) VALIDACIÓN Y CREACIÓN DE PEDIDOS (app/Http/Controllers/OrderController.php)
+     
+     Línea 37: Validación del método de pago
+       'payment_method' => 'required|in:Card,Yape',
+       Solo se permite "Card" o "Yape". Cualquier otro valor causa error de validación.
+
+     Línea 61: Asignación del estado de pago según el método
+       'estado_pago' => $request->payment_method === 'Yape' ? 'Pendiente' : null,
+       Si el cliente paga con Yape, estado_pago se asigna como "Pendiente".
+       Si paga con tarjeta, estado_pago es null (porque la tarjeta se procesa al instante).
+
+     Líneas 69-70: Mensaje diferenciado para el usuario
+       Si es Yape: "¡Pedido realizado! Tu pago con Yape está pendiente de confirmación."
+       Si es tarjeta: "¡Pedido realizado! Pago con tarjeta registrado."
+
+  b) GESTIÓN DE ESTADO DE PAGO (app/Http/Controllers/Admin/OrderController.php)
+     
+     Línea 33 (updatePaymentStatus method):
+       Permite cambiar el estado de pago únicamente para pedidos con Yape.
+       Estados posibles: Pendiente → Pagado → Rechazado
+
+     Lógica de cambio de estado:
+       Si estado_pago = 'Pagado'
+         → El sistema marca automáticamente el pedido como 'confirmed'
+         → Se genera el comprobante de pago automáticamente
+       
+       Si estado_pago = 'Rechazado'
+         → El sistema cambia el pedido a 'cancelled'
+         → No se genera comprobante
+
+  c) MODELO DE ÓRDENES (app/Models/Order.php)
+     
+     Campos agregados a la tabla 'orders':
+       - metodo_pago (string): Card o Yape
+       - estado_pago (string): Pendiente, Pagado, Rechazado
+       - fecha_pago (timestamp): Fecha en que se procesa el pago
+     
+     Estos campos permiten registrar toda la información del pago para auditoría.
+
+  d) MIGRACIONES (database/migrations/)
+     
+     0009_add_payment_fields_to_orders_table.php
+       Crea los campos metodo_pago, estado_pago y fecha_pago.
+     
+     0010_add_missing_payment_fields_to_orders_table.php
+       Verifica y agrega nuevamente los campos si no existen.
+     
+     0011_remove_comprobante_pago_from_orders_table.php
+       Elimina el campo comprobante_pago porque ahora se genera automáticamente
+       en storage/app/public/comprobantes/ como archivo, no en la base de datos.
+
+  e) VISTAS DEL CLIENTE (resources/views/orders/)
+     
+     show.blade.php (líneas 30+):
+       Muestra los detalles del pago:
+         - Método de pago (Yape o Tarjeta)
+         - Estado de pago (Pendiente, Pagado, Rechazado)
+         - Fecha de pago (cuándo se procesó)
+       
+       Si el pago está "Pagado", se muestra el enlace al comprobante descargable.
+
+  f) VISTAS DEL ADMINISTRADOR (resources/views/admin/orders/)
+     
+     index.blade.php (líneas 94+):
+       Solo para pedidos con metodo_pago = 'Yape', aparece un selector con 3 opciones:
+         - Pendiente (estado inicial)
+         - Pagado (confirmar que se recibió el pago → genera comprobante)
+         - Rechazado (rechazar el pago → cancela el pedido)
+       
+       El administrador hace clic en "Pago" para confirmar cuando recibe el pago.
+
+  g) TESTS (tests/Feature/OrderPaymentTest.php)
+     
+     test_a_client_can_store_an_order_with_yape_payment():
+       Verifica que:
+         - Se puede crear un pedido con método "Yape"
+         - El estado del pago se asigna como "Pendiente"
+         - El pedido se almacena correctamente en la base de datos
+
+
+¿Dónde está el comprobante de pago?
+
+  Ubicación en el proyecto:
+    storage/app/public/comprobantes/
+    
+  Archivos generados:
+    El nombre del comprobante incluye el ID del pedido y la fecha:
+      order_{id}_{timestamp}.pdf  (ejemplo: order_5_2024_12_25_143022.pdf)
+  
+  Generación automática:
+    1. El admin marca el pago como "Pagado" en /admin/orders
+    2. El sistema ejecuta updatePaymentStatus() en Admin/OrderController.php
+    3. Se genera automáticamente el PDF del comprobante
+    4. Se almacena en storage/app/public/comprobantes/
+    5. El cliente puede descargarlo desde su vista de pedido (show.blade.php)
+  
+  Contenido del comprobante:
+    - Número de boleta (ID del pedido)
+    - Fecha de emisión
+    - Datos del cliente
+    - Método de pago (Yape)
+    - Estado de pago (Pagado)
+    - Fecha de pago
+    - Detalles de los platos (nombre, cantidad, precio unitario)
+    - Total del pedido
+    - Código QR de verificación
+
+  Cambios realizados:
+    En migraciones anteriores se intentó almacenar un campo "comprobante_pago" 
+    en la tabla orders (como texto o archivo), pero se removió en la migración 0011
+    porque la solución final es generar el comprobante como archivo PDF en el servidor.
+    Esto es más seguro y eficiente que almacenar binarios en la base de datos.
+
+
+¿Cómo ver el comprobante?
+
+  Cliente:
+    1. Inicia sesión en la plataforma
+    2. Va a "Mis pedidos" (/orders)
+    3. Selecciona el pedido pagado con Yape
+    4. Si el estado de pago es "Pagado", aparece un botón "Descargar comprobante"
+    5. Al hacer clic, descarga el PDF
+
+  Administrador:
+    1. Inicia sesión como admin
+    2. Va a "Administración > Pedidos" (/admin/orders)
+    3. En la tabla, busca el pedido con Yape
+    4. Si el estado de pago es "Pagado", puede ver que el comprobante existe
+    5. El comprobante también está disponible desde el almacenamiento del servidor
+
+
+¿Qué pasa si el pago se rechaza?
+
+  1. El admin selecciona "Rechazado" en la tabla de pedidos
+  2. El estado del pago cambia a "Rechazado"
+  3. El pedido automáticamente pasa a "Cancelado"
+  4. NO se genera comprobante
+  5. El cliente recibe un mensaje indicando que el pedido fue cancelado
+  6. El cliente puede intentar realizar un nuevo pedido
