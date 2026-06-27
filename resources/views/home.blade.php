@@ -194,7 +194,7 @@
 <section class="py-20 bg-red-500 text-white text-center">
     <div class="max-w-2xl mx-auto px-4">
         <h2 class="text-3xl font-bold mb-4">¿Listo para pedir?</h2>
-        <p class="text-red-100 mb-8">Creá tu cuenta y hacé tu primer pedido en minutos.</p>
+        <p class="text-red-100 mb-8">Crea tu cuenta y haz tu primer pedido en minutos.</p>
         <div class="flex flex-wrap justify-center gap-4">
             @auth
                 <a href="{{ route('orders.restaurants') }}" class="bg-zinc-900 text-red-400 hover:bg-zinc-800 font-bold px-8 py-3 rounded-xl transition">
