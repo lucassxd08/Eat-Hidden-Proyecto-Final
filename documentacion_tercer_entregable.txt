@@ -44,36 +44,44 @@ Modelo:         app/Models/Restaurant.php
 ¿Qué hace cada método del controlador?
 
   index()
-    Obtiene todos los restaurantes con el conteo de platos usando withCount('dishes').
+    Obtiene todos los restaurantes con el conteo de platos asociados.
     Cada fila del listado tiene un botón "Gestionar" que lleva a show().
+    Código usado: Restaurant::withCount('dishes')->latest()->get()
+      withCount() agrega una columna virtual dishes_count sin cargar los registros.
+      latest() ordena por created_at descendente.
 
   create()
     Devuelve la vista con el formulario vacío para crear un restaurante.
+    Código usado: return view('admin.restaurants.create')
 
   store(Request $request)
-    Valida nombre obligatorio, máximo 255 caracteres.
-    Envuelto en try-catch: si falla la BD muestra mensaje de error en español.
-    Crea el registro con Restaurant::create() y redirige al listado.
+    Valida nombre obligatorio, máximo 255 caracteres. Si falla la BD muestra error.
+    Código usado: $request->validate([...]), Restaurant::create([...]),
+      redirect()->route('admin.restaurants.index')->with('success', '...')
+      El ->with() guarda el mensaje en sesión flash para mostrarlo en la vista.
 
   show(Restaurant $restaurant)
-    Carga el restaurante con todos sus platos (incluyendo la categoría de cada plato)
-    y las categorías activas para el formulario de nuevo plato.
-    La vista muestra: datos del restaurante, formulario para añadir plato inline,
-    y tabla con todos los platos actuales (editar / eliminar).
+    Carga el restaurante con sus platos y la categoría de cada plato en una sola consulta.
+    También carga las categorías activas para el selector del formulario de nuevo plato.
+    Código usado: $restaurant->load(['dishes' => fn($q) => $q->with('category')->orderBy('name')])
+      load() es lazy eager loading: carga relaciones sobre un modelo ya instanciado.
+      La función anónima fn($q) permite aplicar condiciones dentro de la relación cargada.
 
   edit(Restaurant $restaurant)
-    Route Model Binding busca el restaurante por ID en la URL.
-    Devuelve la vista con los datos cargados para editar.
+    Laravel inyecta el modelo automáticamente buscando el ID en la URL (Route Model Binding).
+    Devuelve la vista con los datos del restaurante ya cargados en el formulario.
+    Código usado: return view('admin.restaurants.edit', compact('restaurant'))
 
   update(Request $request, Restaurant $restaurant)
-    Mismas validaciones que store, envuelto en try-catch.
-    Actualiza el registro con $restaurant->update().
+    Valida los mismos campos que store y actualiza solo los campos enviados.
+    Código usado: $restaurant->update([...])
+      update() en Eloquent solo modifica los campos indicados, no toda la fila.
 
   destroy(Restaurant $restaurant)
-    Primero verifica: si el restaurante tiene platos, retorna error sin intentar eliminar.
-      if ($restaurant->dishes()->count() > 0) → retorna error.
-    Envuelto en try-catch para cualquier otro fallo inesperado.
-    Si no tiene platos, elimina con $restaurant->delete().
+    Verifica relaciones antes de intentar eliminar para evitar errores de BD.
+    Código usado: $restaurant->dishes()->count() para la verificación previa,
+      $restaurant->delete() para la eliminación,
+      back()->with('error', '...') para redirigir con mensaje si no se puede eliminar.
 
 ¿Cómo se muestra el nombre y no el ID de la foreign key?
   En el listado de PLATOS, la columna "Restaurante" muestra:
@@ -102,40 +110,42 @@ Modelo:         app/Models/Dish.php
 ¿Qué hace cada método del controlador?
 
   index()
-    Carga todos los platos junto con su categoría y restaurante usando
-    Dish::with('category', 'restaurant'). El "with()" evita el problema
-    N+1 (consultas repetidas) cargando todo en una sola query.
+    Carga todos los platos junto con su categoría y restaurante en una sola consulta.
+    Código usado: Dish::with('category', 'restaurant')->orderBy('name')->get()
+      with() hace eager loading: resuelve las relaciones con 2 queries extras en vez
+      de ejecutar una query por cada plato (problema N+1).
 
   create()
-    Carga categorías activas y restaurantes activos para los selectores del formulario.
+    Carga categorías y restaurantes activos para poblar los selectores del formulario.
+    Código usado: Category::where('active', true)->orderBy('name')->get()
+      Se filtran solo los activos para no mostrar categorías deshabilitadas.
 
   store(Request $request)
-    Valida: restaurante obligatorio, nombre obligatorio, precio numérico positivo,
-    imagen opcional (máx 2MB). La categoría puede ser:
-      a) category_id: ID de una categoría ya existente (selector)
-      b) new_category: texto libre → se crea la categoría automáticamente con
-         Category::firstOrCreate() (si ya existe con ese nombre, la reutiliza)
-    Si ninguna de las dos llega, retorna error en español.
-    Si hay imagen, se guarda en storage/app/public/dishes/.
-    Envuelto en try-catch con mensaje en español si falla.
-    Si se envió "back_to_restaurant", redirige a la gestión del restaurante.
+    Valida los campos y crea el plato. La categoría puede venir del selector o como texto nuevo.
+    Código usado: $request->validate([...]) para validar,
+      Category::firstOrCreate(['name' => ...], ['active' => true]) para crear categoría
+      al vuelo si se escribió una nueva (si ya existe con ese nombre, la reutiliza),
+      $request->hasFile('image') y ->store('dishes', 'public') para guardar imagen,
+      unset($data['new_category']) para limpiar el campo extra antes de Dish::create($data).
 
   edit(Dish $dish)
-    Route Model Binding busca el plato. Carga categorías y restaurantes para los
-    selectores. Si viene con ?back={id}, la vista muestra "← Volver al restaurante"
-    y agrega el campo oculto back_to_restaurant para mantener el contexto de navegación.
+    Route Model Binding inyecta el plato. Carga selectores para el formulario de edición.
+    Código usado: request('back') para leer el parámetro ?back={id} de la URL.
+      La vista usa ese valor para mostrar el enlace "← Volver al restaurante" y para
+      incluir el campo oculto back_to_restaurant en el formulario.
 
   update(Request $request, Dish $dish)
-    Mismas validaciones que store. Si hay imagen nueva, elimina la anterior del disco
-    con Storage::disk('public')->delete() y guarda la nueva. Envuelto en try-catch.
-    Si existe back_to_restaurant, redirige al restaurante correspondiente.
+    Actualiza el plato. Si hay imagen nueva, borra la anterior para no acumular archivos.
+    Código usado: Storage::disk('public')->delete($dish->image) para borrar la imagen
+      anterior del servidor, ->store('dishes', 'public') para guardar la nueva,
+      $dish->update($data) para actualizar solo los campos modificados.
 
   destroy(Dish $dish)
-    Primero verifica si el plato tiene pedidos asociados:
-      if ($dish->orderItems()->count() > 0) → retorna error.
-    Si tiene imagen, la elimina del disco. Elimina el registro.
-    Si back_to_restaurant está presente en el formulario de eliminación,
-    redirige al restaurante. Envuelto en try-catch.
+    Verifica que el plato no tenga pedidos antes de eliminarlo.
+    Código usado: $dish->orderItems()->count() para la verificación previa,
+      Storage::disk('public')->delete($dish->image) para borrar la imagen del disco,
+      $dish->delete() para eliminar el registro,
+      request()->filled('back_to_restaurant') para decidir a dónde redirigir.
 
 ¿Foreign keys con nombre, no con ID?
   En el listado de platos:
@@ -164,28 +174,36 @@ Modelo:         app/Models/Category.php
 ¿Qué hace cada método del controlador?
 
   index()
-    Obtiene todas las categorías con el conteo de platos usando withCount('dishes').
+    Lista todas las categorías con el total de platos que tiene cada una.
+    Código usado: Category::withCount('dishes')->orderBy('name')->get()
+      withCount() agrega la columna dishes_count sin traer los platos completos.
 
   create()
     Devuelve la vista con el formulario vacío.
+    Código usado: return view('admin.categories.create')
 
   store(Request $request)
-    Valida: nombre obligatorio, único en la tabla ('unique:categories'),
-    descripción opcional, activo booleano. Envuelto en try-catch.
-    Crea la categoría con Category::create($data).
+    Valida que el nombre no se repita en toda la tabla y crea la categoría.
+    Código usado: $request->validate(['name' => 'required|unique:categories', ...])
+      La regla unique:categories compara contra todos los registros de esa tabla.
+      $request->boolean('active', true) convierte el checkbox en true/false.
+      Category::create($data) inserta el registro usando los campos del $fillable.
 
   edit(Category $category)
-    Route Model Binding busca la categoría. Devuelve la vista con datos.
+    Route Model Binding inyecta la categoría por su ID en la URL.
+    Código usado: return view('admin.categories.edit', compact('category'))
+      compact() crea el array ['category' => $category] de forma abreviada.
 
   update(Request $request, Category $category)
-    Valida el nombre como único excepto el registro actual:
-      'unique:categories,name,' . $category->id
-    Esto permite guardar sin cambiar el nombre sin que falle la validación.
-    Envuelto en try-catch.
+    Valida el nombre como único pero ignorando el registro que se está editando.
+    Código usado: 'unique:categories,name,' . $category->id
+      El tercer parámetro de unique le dice a Laravel qué ID ignorar en la comparación,
+      así se puede guardar sin cambiar el nombre sin que falle la validación de unicidad.
 
   destroy(Category $category)
-    Si la categoría tiene platos asignados retorna error de integridad.
-    Si no tiene, la elimina. Envuelto en try-catch.
+    Verifica que no haya platos antes de eliminar para proteger la integridad de la BD.
+    Código usado: $category->dishes()->count() para la verificación previa,
+      $category->delete() para eliminar el registro si pasa la verificación.
 
 ¿Se muestran IDs?
   No. En el listado de categorías solo se muestra nombre, descripción,
@@ -230,23 +248,26 @@ Flujo del proceso:
 ¿Cómo funciona el código del controlador?
 
   index()
-    Carga todos los pedidos con su cliente (relación client) y sus items
-    junto con el plato de cada item (relación items.dish).
-    Order::with('client', 'items.dish')->latest()->get()
-    "latest()" ordena del más reciente al más antiguo.
+    Carga todos los pedidos con sus relaciones en una sola operación.
+    Código usado: Order::with('client', 'items.dish')->latest()->get()
+      with('client') carga el usuario que hizo el pedido (FK client_id → users).
+      with('items.dish') carga los ítems del pedido y el plato de cada ítem (relación anidada).
+      latest() es equivalente a orderBy('created_at', 'desc').
 
   updateStatus(Request $request, Order $order)
-    Valida que el estado sea uno de los 7 valores permitidos.
-    Actualiza el pedido con $order->update(['status' => $request->status]).
-    Envuelto en try-catch: si falla, retorna mensaje de error en español.
+    Valida que el nuevo estado sea uno de los 7 valores permitidos y lo guarda.
+    Código usado: $request->validate(['status' => 'required|in:pending,confirmed,...'])
+      La regla in: lista los valores exactos aceptados; cualquier otro valor falla.
+      $order->update(['status' => $request->status]) actualiza solo ese campo.
+      back()->with('success', '...') redirige a la página anterior con mensaje flash.
 
   updatePaymentStatus(Request $request, Order $order)
-    Solo aplica a pedidos pagados con Yape.
-    Valida que el estado de pago sea: Pendiente, Pagado o Rechazado.
-    Si el pago se marca como "Pagado", el pedido pasa a "confirmed".
-    Si se marca como "Rechazado", el pedido pasa a "cancelled".
-    Envuelto en try-catch con mensaje en español.
-    Ruta: PATCH /admin/orders/{order}/payment-status
+    Cambia el estado de pago Yape y ajusta automáticamente el estado del pedido.
+    Código usado: $request->validate(['estado_pago' => 'required|in:Pendiente,Pagado,Rechazado'])
+      match($request->estado_pago) { 'Pagado' => 'confirmed', 'Rechazado' => 'cancelled' }
+      El match() de PHP 8 asigna el nuevo estado del pedido según la decisión del admin.
+      $order->update([...]) actualiza estado_pago, fecha_pago y status en una sola llamada.
+      Ruta: PATCH /admin/orders/{order}/payment-status (definida manualmente en web.php).
 
 ¿Los pedidos entregados/cancelados no se pueden cambiar?
   Sí. En la vista, los pedidos con estado "delivered" o "cancelled" muestran
