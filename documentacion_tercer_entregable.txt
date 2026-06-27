@@ -26,6 +26,12 @@ Las rutas de los 3 CRUDs están definidas en:
 ----------------------------------------
 CRUD 1: RESTAURANTES (Dark Kitchens)
 ----------------------------------------
+Para este CRUD usamos el modelo Restaurant con Eloquent ORM, un controlador
+con Route Model Binding y vistas Blade con Tailwind CSS. La ruta resource genera
+las 7 acciones automáticamente. Se agregó un método show() adicional que sirve
+como hub de gestión: desde ahí se añaden, editan y eliminan los platos del
+restaurante sin salir de esa pantalla.
+
 URL base:       /admin/restaurants
 Controlador:    app/Http/Controllers/Admin/RestaurantController.php
 Vistas:         resources/views/admin/restaurants/
@@ -79,6 +85,12 @@ Modelo:         app/Models/Restaurant.php
 ----------------------------------------
 CRUD 2: PLATOS
 ----------------------------------------
+Para este CRUD usamos el modelo Dish con dos foreign keys (restaurant_id y
+category_id). El controlador usa eager loading con with() para evitar consultas
+N+1. Se implementó creación de categoría al vuelo con firstOrCreate() para que
+el admin pueda escribir una nueva categoría directamente en el formulario sin
+tener que ir a otra pantalla. Las imágenes se gestionan con Storage de Laravel.
+
 URL base:       /admin/dishes
 Controlador:    app/Http/Controllers/Admin/DishController.php
 Vistas:         resources/views/admin/dishes/
@@ -136,6 +148,11 @@ Modelo:         app/Models/Dish.php
 ----------------------------------------
 CRUD 3: CATEGORÍAS
 ----------------------------------------
+Para este CRUD usamos el modelo Category con validación de unicidad en el nombre
+para evitar duplicados. El controlador protege el DELETE verificando si hay
+platos asignados antes de intentar eliminar. Se usa withCount() para mostrar
+cuántos platos tiene cada categoría sin hacer consultas adicionales.
+
 URL base:       /admin/categories
 Controlador:    app/Http/Controllers/Admin/CategoryController.php
 Vistas:         resources/views/admin/categories/
@@ -178,6 +195,12 @@ Modelo:         app/Models/Category.php
 ========================================
 2. PROCESO SECUNDARIO
 ========================================
+
+Para este proceso usamos el modelo Order con sus relaciones (client, items.dish),
+dos rutas PATCH adicionales fuera del resource (una para estado del pedido y otra
+para estado de pago Yape), y lógica condicional en el controlador que cambia
+automáticamente el estado del pedido según la decisión del admin sobre el pago.
+La vista diferencia pedidos Yape de tarjeta y bloquea cambios en pedidos finalizados.
 
 El proceso secundario elegido es:
   "Gestión del estado de todos los pedidos por parte del Administrador"
@@ -260,6 +283,12 @@ Escenarios de prueba del proceso secundario:
 3. DISTRIBUCIÓN DEL CÓDIGO
 ========================================
 
+El proyecto usa la arquitectura MVC de Laravel. Las rutas están agrupadas por rol
+con middleware personalizado (CheckRole). Los modelos definen las relaciones entre
+tablas con Eloquent. Los controladores están separados en una carpeta Admin/ para
+los que solo usa el administrador. Las vistas usan un layout compartido (app.blade.php)
+con sidebar dinámico según el rol del usuario autenticado.
+
 El proyecto sigue la arquitectura MVC de Laravel (Modelo - Vista - Controlador).
 
   MODELOS (app/Models/)
@@ -329,6 +358,12 @@ El proyecto sigue la arquitectura MVC de Laravel (Modelo - Vista - Controlador).
 4. TECNOLOGÍAS Y EXTENSIONES USADAS
 ========================================
 
+Se usó Laravel 12 como framework principal con Laravel Breeze como Starter Kit
+para el sistema de autenticación (login, registro, recuperación de contraseña).
+El diseño visual se construyó completamente con Tailwind CSS v4 compilado por Vite.
+No se usaron librerías externas de componentes UI; todo el frontend es HTML/Blade
+con clases de Tailwind y JavaScript vanilla para el carrito de compras.
+
   - Laravel 12          Framework PHP principal (MVC, ORM Eloquent, Blade)
   - Laravel Breeze      Starter Kit para autenticación (login, registro, rutas auth)
   - Tailwind CSS v4     Framework CSS de utilidades (todo el diseño visual)
@@ -352,6 +387,11 @@ El proyecto sigue la arquitectura MVC de Laravel (Modelo - Vista - Controlador).
 5. SUBSANACIÓN DE PROBLEMAS ANTERIORES
 ========================================
 
+Se corrigieron dos errores detectados en la segunda presentación. El primero era
+un error 500 al eliminar un usuario con pedidos asociados (fallo de integridad
+referencial). El segundo era un método authorize() que no funcionaba por falta
+del trait correspondiente en el controlador base.
+
   Problema detectado en la segunda presentación:
     Al intentar eliminar un usuario que tenía pedidos asociados, el sistema
     lanzaba un error de integridad de base de datos (error 500).
@@ -370,6 +410,12 @@ El proyecto sigue la arquitectura MVC de Laravel (Modelo - Vista - Controlador).
 ========================================
 6. IMPLEMENTACIÓN DE YAPE
 ========================================
+
+Para implementar Yape se agregaron tres campos en la tabla orders (metodo_pago,
+estado_pago, fecha_pago) mediante migraciones. En el controlador del cliente se
+valida que el método de pago sea "Card" o "Yape" y se asigna el estado inicial
+según el método. En el controlador admin se creó una ruta PATCH separada para
+gestionar el estado de pago con lógica automática de cambio de estado del pedido.
 
 ¿Qué es Yape?
   Yape es un método de pago digital alternativo a las tarjetas de crédito.
@@ -465,6 +511,13 @@ Flujo de pago con Yape:
 ========================================
 7. PREVENCIÓN DE ERRORES (try-catch)
 ========================================
+
+Se envolvieron todos los métodos store(), update() y destroy() de los 5
+controladores con bloques try-catch. Las verificaciones de integridad referencial
+(relaciones activas) se hacen antes del try-catch con un if explícito para dar
+mensajes claros. El catch captura cualquier excepción inesperada y usa
+session()->flash() via ->with('error', ...) para mostrar el mensaje en pantalla
+sin exponer detalles técnicos al usuario.
 
 Todos los métodos de escritura de los 5 controladores están protegidos con try-catch.
 Si ocurre cualquier error inesperado (fallo de BD, excepción de Eloquent, etc.),
