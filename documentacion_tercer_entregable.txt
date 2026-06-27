@@ -29,41 +29,49 @@ CRUD 1: RESTAURANTES (Dark Kitchens)
 URL base:       /admin/restaurants
 Controlador:    app/Http/Controllers/Admin/RestaurantController.php
 Vistas:         resources/views/admin/restaurants/
-                  - index.blade.php  (listado)
+                  - index.blade.php  (listado de restaurantes)
                   - create.blade.php (formulario nuevo)
                   - edit.blade.php   (formulario editar)
+                  - show.blade.php   (gestión de platos del restaurante)
 Modelo:         app/Models/Restaurant.php
 
 ¿Qué hace cada método del controlador?
 
   index()
-    Obtiene todos los restaurantes con el conteo de platos que tiene cada uno
-    usando "withCount('dishes')". Envía los datos a la vista del listado.
+    Obtiene todos los restaurantes con el conteo de platos usando withCount('dishes').
+    Cada fila del listado tiene un botón "Gestionar" que lleva a show().
 
   create()
-    Solo devuelve la vista con el formulario vacío para crear un restaurante.
+    Devuelve la vista con el formulario vacío para crear un restaurante.
 
   store(Request $request)
-    Valida que el nombre sea obligatorio y máximo 255 caracteres.
-    Crea el registro en la base de datos con Restaurant::create().
-    Redirige al listado con mensaje de éxito.
+    Valida nombre obligatorio, máximo 255 caracteres.
+    Envuelto en try-catch: si falla la BD muestra mensaje de error en español.
+    Crea el registro con Restaurant::create() y redirige al listado.
+
+  show(Restaurant $restaurant)
+    Carga el restaurante con todos sus platos (incluyendo la categoría de cada plato)
+    y las categorías activas para el formulario de nuevo plato.
+    La vista muestra: datos del restaurante, formulario para añadir plato inline,
+    y tabla con todos los platos actuales (editar / eliminar).
 
   edit(Restaurant $restaurant)
-    Laravel busca automáticamente el restaurante por su ID en la URL
-    (esto se llama Route Model Binding). Devuelve la vista con los datos cargados.
+    Route Model Binding busca el restaurante por ID en la URL.
+    Devuelve la vista con los datos cargados para editar.
 
   update(Request $request, Restaurant $restaurant)
-    Valida igual que store, luego actualiza el registro con $restaurant->update().
+    Mismas validaciones que store, envuelto en try-catch.
+    Actualiza el registro con $restaurant->update().
 
   destroy(Restaurant $restaurant)
-    Antes de eliminar, verifica si el restaurante tiene platos:
+    Primero verifica: si el restaurante tiene platos, retorna error sin intentar eliminar.
       if ($restaurant->dishes()->count() > 0) → retorna error.
-    Así se evitan errores de integridad referencial en la base de datos.
-    Si no tiene platos, lo elimina con $restaurant->delete().
+    Envuelto en try-catch para cualquier otro fallo inesperado.
+    Si no tiene platos, elimina con $restaurant->delete().
 
 ¿Cómo se muestra el nombre y no el ID de la foreign key?
-  En la vista del listado de PLATOS, la columna "Restaurante" muestra
-  $dish->restaurant->name  (no el restaurant_id numérico).
+  En el listado de PLATOS, la columna "Restaurante" muestra:
+    $dish->restaurant->name  (no el restaurant_id numérico).
   Esto funciona gracias a la relación definida en el modelo Dish:
     public function restaurant() { return $this->belongsTo(Restaurant::class); }
 
@@ -87,34 +95,38 @@ Modelo:         app/Models/Dish.php
     N+1 (consultas repetidas) cargando todo en una sola query.
 
   create()
-    Carga las categorías activas y restaurantes activos para mostrarlos
-    como opciones en los selectores del formulario. Envía los datos a la vista.
+    Carga categorías activas y restaurantes activos para los selectores del formulario.
 
   store(Request $request)
     Valida: restaurante y categoría deben existir en sus tablas (exists:tabla,id),
     nombre obligatorio, precio numérico positivo, imagen opcional (máx 2MB).
     Si hay imagen, se guarda en storage/app/public/dishes/ con ->store().
-    Crea el plato con Dish::create($data).
+    Envuelto en try-catch con mensaje en español si falla.
+    Si se envió "back_to_restaurant", redirige de vuelta a la gestión del restaurante
+    en vez de ir al listado general de platos.
 
   edit(Dish $dish)
-    Route Model Binding busca el plato por ID. Carga también categorías y
-    restaurantes para rellenar los selectores del formulario de edición.
+    Route Model Binding busca el plato. Carga categorías y restaurantes para los
+    selectores. Si viene con ?back={id}, la vista muestra "← Volver al restaurante"
+    y agrega el campo oculto back_to_restaurant para mantener el contexto de navegación.
 
   update(Request $request, Dish $dish)
-    Mismas validaciones que store. Si se sube imagen nueva, elimina la anterior
-    con Storage::disk('public')->delete($dish->image) y guarda la nueva.
+    Mismas validaciones que store. Si hay imagen nueva, elimina la anterior del disco
+    con Storage::disk('public')->delete() y guarda la nueva. Envuelto en try-catch.
+    Si existe back_to_restaurant, redirige al restaurante correspondiente.
 
   destroy(Dish $dish)
-    Verifica si el plato tiene pedidos asociados:
+    Primero verifica si el plato tiene pedidos asociados:
       if ($dish->orderItems()->count() > 0) → retorna error.
-    Si tiene imagen, la elimina del disco.
-    Luego elimina el registro con $dish->delete().
+    Si tiene imagen, la elimina del disco. Elimina el registro.
+    Si back_to_restaurant está presente en el formulario de eliminación,
+    redirige al restaurante. Envuelto en try-catch.
 
 ¿Foreign keys con nombre, no con ID?
-  En el listado de platos se muestra:
+  En el listado de platos:
     $dish->category->name     (no category_id)
     $dish->restaurant->name   (no restaurant_id)
-  En los formularios se muestran selectores con los nombres, pero el valor
+  En los formularios se muestran selectores con nombres, pero el valor
   enviado al servidor es el ID. Laravel valida que ese ID exista en la tabla.
 
 
@@ -139,7 +151,7 @@ Modelo:         app/Models/Category.php
 
   store(Request $request)
     Valida: nombre obligatorio, único en la tabla ('unique:categories'),
-    descripción opcional, activo booleano.
+    descripción opcional, activo booleano. Envuelto en try-catch.
     Crea la categoría con Category::create($data).
 
   edit(Category $category)
@@ -149,10 +161,11 @@ Modelo:         app/Models/Category.php
     Valida el nombre como único excepto el registro actual:
       'unique:categories,name,' . $category->id
     Esto permite guardar sin cambiar el nombre sin que falle la validación.
+    Envuelto en try-catch.
 
   destroy(Category $category)
     Si la categoría tiene platos asignados retorna error de integridad.
-    Si no tiene, la elimina.
+    Si no tiene, la elimina. Envuelto en try-catch.
 
 ¿Se muestran IDs?
   No. En el listado de categorías solo se muestra nombre, descripción,
@@ -197,20 +210,21 @@ Flujo del proceso:
     "latest()" ordena del más reciente al más antiguo.
 
   updateStatus(Request $request, Order $order)
-    Valida que el estado recibido sea uno de los 7 valores permitidos.
-    Actualiza el pedido: $order->update(['status' => $request->status]).
-    Redirige de vuelta a la misma página con mensaje de confirmación.
+    Valida que el estado sea uno de los 7 valores permitidos.
+    Actualiza el pedido con $order->update(['status' => $request->status]).
+    Envuelto en try-catch: si falla, retorna mensaje de error en español.
 
   updatePaymentStatus(Request $request, Order $order)
     Solo aplica a pedidos pagados con Yape.
     Valida que el estado de pago sea: Pendiente, Pagado o Rechazado.
-    Si el pago se marca como "Pagado", el pedido pasa automáticamente a "confirmed".
+    Si el pago se marca como "Pagado", el pedido pasa a "confirmed".
     Si se marca como "Rechazado", el pedido pasa a "cancelled".
+    Envuelto en try-catch con mensaje en español.
     Ruta: PATCH /admin/orders/{order}/payment-status
 
 ¿Los pedidos entregados/cancelados no se pueden cambiar?
   Sí. En la vista, los pedidos con estado "delivered" o "cancelled" muestran
-  un guión "—" en vez del selector, para no permitir cambios sobre pedidos finales.
+  un guión "—" en vez del selector.
 
 Escenarios de prueba del proceso secundario:
 
@@ -266,18 +280,18 @@ El proyecto sigue la arquitectura MVC de Laravel (Modelo - Vista - Controlador).
 
     Admin/ (solo accesibles por administrador):
       Admin/UserController.php         — CRUD de usuarios
-      Admin/RestaurantController.php   — CRUD de restaurantes
+      Admin/RestaurantController.php   — CRUD de restaurantes + gestión de platos
       Admin/DishController.php         — CRUD de platos
       Admin/CategoryController.php     — CRUD de categorías
       Admin/OrderController.php        — Proceso secundario: gestión de pedidos
 
   RUTAS (routes/web.php)
     Agrupadas por rol con middleware:
-      Públicas              — sin middleware
-      ['auth', 'role:admin']    — solo administrador
-      ['auth', 'role:client,admin'] — cliente y admin
-      ['auth', 'role:kitchen,admin'] — cocina y admin
-      ['auth', 'role:delivery,admin'] — repartidor y admin
+      Públicas                          — sin middleware
+      ['auth', 'role:admin']            — solo administrador
+      ['auth', 'role:client,admin']     — cliente y admin
+      ['auth', 'role:kitchen,admin']    — cocina y admin
+      ['auth', 'role:delivery,admin']   — repartidor y admin
 
   MIDDLEWARE PERSONALIZADO (app/Http/Middleware/CheckRole.php)
     Registrado como alias "role" en bootstrap/app.php.
@@ -285,17 +299,16 @@ El proyecto sigue la arquitectura MVC de Laravel (Modelo - Vista - Controlador).
     Si no cumple, redirige a la página principal.
 
   VISTAS (resources/views/)
-    layouts/app.blade.php      — Layout principal: sidebar oscuro para autenticados,
-                                 navbar superior para visitantes públicos.
-    layouts/guest.blade.php    — Layout split para login/registro: panel izquierdo
-                                 con branding, panel derecho con formulario.
-    dashboard.blade.php        — Inicio del dashboard con estadísticas.
-    auth/login.blade.php       — Formulario de inicio de sesión.
-    auth/register.blade.php    — Formulario de registro.
+    layouts/app.blade.php      — Layout principal con sidebar. El rol "client"
+                                 solo ve Inicio, Menú y Pedidos (Cocina y Delivery
+                                 están ocultos con @if(!auth()->user()->isClient())).
+    layouts/guest.blade.php    — Layout split para login/registro.
+    dashboard.blade.php        — Inicio con estadísticas.
     admin/                     — Todas las vistas de administración.
-    orders/                    — Flujo de pedido del cliente. Incluye
-                                 selección de método de pago (tarjeta o Yape
-                                 con QR), y vista de detalle con estado de pago.
+    orders/                    — Flujo de pedido del cliente. Incluye selección
+                                 de método de pago (tarjeta o Yape con QR), resumen
+                                 con categoría y plato en el carrito, y boleta de
+                                 detalle del pedido.
     kitchen/                   — Vista del personal de cocina.
     delivery/                  — Vista del repartidor.
 
@@ -305,7 +318,7 @@ El proyecto sigue la arquitectura MVC de Laravel (Modelo - Vista - Controlador).
 
   SEEDER (database/seeders/DatabaseSeeder.php)
     Crea 4 usuarios (admin, cocina, cliente, repartidor), 4 restaurantes,
-    5 categorías, 29 platos y 1 pedido de prueba.
+    5 categorías, 29 platos distribuidos entre restaurantes, y 1 pedido de prueba.
     Se ejecuta con: php artisan migrate:fresh --seed --force
 
 
@@ -357,17 +370,17 @@ El proyecto sigue la arquitectura MVC de Laravel (Modelo - Vista - Controlador).
 
 ¿Qué es Yape?
   Yape es un método de pago digital alternativo a las tarjetas de crédito.
-  En este proyecto, se implementó como una opción adicional en el flujo de compra.
-  Cuando un cliente selecciona Yape, el sistema muestra un código QR estático para
-  el pago, y el administrador confirma manualmente cuando recibe el pago.
+  En este proyecto, el cliente puede elegir Yape al momento de confirmar su pedido.
+  El sistema muestra un código QR estático para el pago, y el administrador confirma
+  manualmente cuando recibe el pago en su cuenta.
 
 Flujo de pago con Yape:
 
   1. Cliente elige Yape en el checkout
      ↓
-  2. Sistema muestra código QR para escanear (imagen estática en public/images/yape-qr.jpg)
+  2. Sistema muestra código QR para escanear (public/images/yape-qr.jpg)
      ↓
-  3. Cliente confirma el pedido (estado: Pendiente, pago Yape: Pendiente)
+  3. Cliente confirma el pedido → estado: pending, estado_pago: Pendiente
      ↓
   4. Administrador recibe el pago en su cuenta Yape
      ↓
@@ -375,141 +388,119 @@ Flujo de pago con Yape:
      ↓
   6. Pedido pasa automáticamente a estado "Confirmado"
 
-
 ¿Dónde está implementado Yape en el código?
 
-  a) VALIDACIÓN Y CREACIÓN DE PEDIDOS (app/Http/Controllers/OrderController.php)
+  a) CREACIÓN DE PEDIDOS (app/Http/Controllers/OrderController.php — método store)
 
      Validación del método de pago:
-       'payment_method' => 'required|in:Card,Yape',
-       Solo se permite "Card" o "Yape". Cualquier otro valor causa error de validación.
+       'payment_method' => 'required|in:Card,Yape'
+       Solo se permite "Card" o "Yape".
 
-     Asignación del estado de pago según el método:
-       'estado_pago' => $request->payment_method === 'Yape' ? 'Pendiente' : null,
-       Si el cliente paga con Yape, estado_pago se asigna como "Pendiente".
-       Si paga con tarjeta, estado_pago es null (la tarjeta se registra directamente).
+     Asignación del estado de pago:
+       'estado_pago' => $request->payment_method === 'Yape' ? 'Pendiente' : null
+       Yape → estado_pago: "Pendiente". Tarjeta → estado_pago: null.
 
      Mensaje diferenciado para el usuario:
-       Si es Yape: "¡Pedido realizado! Tu pago con Yape está pendiente de confirmación."
-       Si es tarjeta: "¡Pedido realizado! Pago con tarjeta registrado."
+       Yape:    "¡Pedido realizado! Tu pago con Yape está pendiente de confirmación."
+       Tarjeta: "¡Pedido realizado! Pago con tarjeta registrado."
 
   b) GESTIÓN DE ESTADO DE PAGO (app/Http/Controllers/Admin/OrderController.php)
 
      Método updatePaymentStatus():
-       Permite cambiar el estado de pago únicamente para pedidos con Yape.
-       Estados posibles: Pendiente → Pagado o Rechazado
+       Permite al admin cambiar el estado de pago de pedidos con Yape.
+       Estados posibles: Pendiente → Pagado o Rechazado.
 
-     Lógica de cambio de estado:
-       Si estado_pago = 'Pagado'
-         → El pedido pasa automáticamente a estado 'confirmed'
-
-       Si estado_pago = 'Rechazado'
-         → El pedido pasa a estado 'cancelled'
+     Lógica:
+       estado_pago = 'Pagado'    → pedido pasa a 'confirmed' automáticamente
+       estado_pago = 'Rechazado' → pedido pasa a 'cancelled' automáticamente
 
   c) MODELO DE ÓRDENES (app/Models/Order.php)
 
-     Campos agregados a la tabla 'orders':
+     Campos en la tabla 'orders':
        - metodo_pago (string): Card o Yape
        - estado_pago (string): Pendiente, Pagado, Rechazado
        - fecha_pago (timestamp): Fecha en que se procesa el pago
 
-     Estos campos permiten registrar toda la información del pago.
-
   d) MIGRACIONES (database/migrations/)
 
      0009_add_payment_fields_to_orders_table.php
-       Crea los campos metodo_pago, estado_pago y fecha_pago.
+       Agrega los campos metodo_pago, estado_pago y fecha_pago.
 
      0010_add_missing_payment_fields_to_orders_table.php
-       Verifica y agrega los campos si no existen (migración de seguridad).
+       Migración de seguridad: agrega campos si no existen.
 
      0011_remove_comprobante_pago_from_orders_table.php
        Elimina el campo comprobante_pago que existía en una versión anterior.
 
-  e) VISTAS DEL CLIENTE (resources/views/orders/)
+  e) VISTA DEL CLIENTE (resources/views/orders/show.blade.php)
 
-     show.blade.php:
-       Muestra la boleta de pago con los detalles del pedido:
-         - Método de pago (Yape o Tarjeta)
-         - Estado de pago (Pendiente, Pagado, Rechazado)
-         - Fecha de pago
-       Incluye botón "Imprimir boleta" para imprimir desde el navegador.
+     Muestra la boleta con los detalles del pedido:
+       - Método de pago (Yape o Tarjeta)
+       - Estado de pago (Pendiente, Pagado, Rechazado)
+       - Fecha de pago
+       - Tabla de platos con cantidad, precio unitario y subtotal
+       - Total del pedido
+     Incluye botón "Imprimir boleta" (window.print() del navegador).
 
-  f) VISTAS DEL ADMINISTRADOR (resources/views/admin/orders/)
+  f) VISTA DEL ADMINISTRADOR (resources/views/admin/orders/index.blade.php)
 
-     index.blade.php:
-       Solo para pedidos con metodo_pago = 'Yape', aparece un selector con 3 opciones:
-         - Pendiente (estado inicial)
-         - Pagado (confirmar que se recibió el pago)
-         - Rechazado (rechazar el pago → cancela el pedido)
+     Para pedidos con metodo_pago = 'Yape', aparece un selector:
+       - Pendiente (estado inicial)
+       - Pagado (confirmar que se recibió el pago → pedido pasa a Confirmado)
+       - Rechazado (rechazar el pago → pedido se cancela)
 
-       El administrador selecciona el estado y presiona "Pago" para confirmar.
+  g) VISTA DEL CLIENTE — CARRITO (resources/views/orders/menu.blade.php)
 
-  g) TESTS (tests/Feature/OrderPaymentTest.php)
-     
-     test_a_client_can_store_an_order_with_yape_payment():
-       Verifica que:
-         - Se puede crear un pedido con método "Yape"
-         - El estado del pago se asigna como "Pendiente"
-         - El pedido se almacena correctamente en la base de datos
-
-
-¿Dónde está el comprobante de pago?
-
-  Ubicación en el proyecto:
-    storage/app/public/comprobantes/
-    
-  Archivos generados:
-    El nombre del comprobante incluye el ID del pedido y la fecha:
-      order_{id}_{timestamp}.pdf  (ejemplo: order_5_2024_12_25_143022.pdf)
-  
-  Generación automática:
-    1. El admin marca el pago como "Pagado" en /admin/orders
-    2. El sistema ejecuta updatePaymentStatus() en Admin/OrderController.php
-    3. Se genera automáticamente el PDF del comprobante
-    4. Se almacena en storage/app/public/comprobantes/
-    5. El cliente puede descargarlo desde su vista de pedido (show.blade.php)
-  
-  Contenido del comprobante:
-    - Número de boleta (ID del pedido)
-    - Fecha de emisión
-    - Datos del cliente
-    - Método de pago (Yape)
-    - Estado de pago (Pagado)
-    - Fecha de pago
-    - Detalles de los platos (nombre, cantidad, precio unitario)
-    - Total del pedido
-    - Código QR de verificación
-
-  Cambios realizados:
-    En migraciones anteriores se intentó almacenar un campo "comprobante_pago" 
-    en la tabla orders (como texto o archivo), pero se removió en la migración 0011
-    porque la solución final es generar el comprobante como archivo PDF en el servidor.
-    Esto es más seguro y eficiente que almacenar binarios en la base de datos.
+     Al armar el pedido, el resumen del carrito muestra para cada plato:
+       - Categoría en rojo (ej. "Hamburguesas")
+       - Nombre del plato
+       - Precio unitario y subtotal
+     Esto se logra con un objeto JavaScript que mapea dish_id → nombre de categoría,
+     construido desde Blade al cargar la vista con los platos del restaurante.
 
 
-¿Cómo ver el comprobante?
+========================================
+7. PREVENCIÓN DE ERRORES (try-catch)
+========================================
 
-  Cliente:
-    1. Inicia sesión en la plataforma
-    2. Va a "Mis pedidos" (/orders)
-    3. Selecciona el pedido pagado con Yape
-    4. Si el estado de pago es "Pagado", aparece un botón "Descargar comprobante"
-    5. Al hacer clic, descarga el PDF
+Todos los métodos de escritura de los 5 controladores están protegidos con try-catch.
+Si ocurre cualquier error inesperado (fallo de BD, excepción de Eloquent, etc.),
+el sistema captura la excepción y muestra un mensaje en español en vez de un error 500.
 
-  Administrador:
-    1. Inicia sesión como admin
-    2. Va a "Administración > Pedidos" (/admin/orders)
-    3. En la tabla, busca el pedido con Yape
-    4. Si el estado de pago es "Pagado", puede ver que el comprobante existe
-    5. El comprobante también está disponible desde el almacenamiento del servidor
+Los mensajes de error según controlador:
 
+  RestaurantController:
+    - "No se pudo crear el restaurante. Intente nuevamente."
+    - "No se pudo actualizar el restaurante. Intente nuevamente."
+    - "No se puede eliminar un restaurante que tiene platos asignados."
+    - "No se pudo eliminar el restaurante. Intente nuevamente."
 
-¿Qué pasa si el pago se rechaza?
+  DishController:
+    - "No se pudo crear el plato. Intente nuevamente."
+    - "No se pudo actualizar el plato. Intente nuevamente."
+    - "No se puede eliminar un plato que tiene pedidos asociados."
+    - "No se pudo eliminar el plato. Intente nuevamente."
 
-  1. El admin selecciona "Rechazado" en la tabla de pedidos
-  2. El estado del pago cambia a "Rechazado"
-  3. El pedido automáticamente pasa a "Cancelado"
-  4. NO se genera comprobante
-  5. El cliente recibe un mensaje indicando que el pedido fue cancelado
-  6. El cliente puede intentar realizar un nuevo pedido
+  CategoryController:
+    - "No se pudo crear la categoría. Intente nuevamente."
+    - "No se pudo actualizar la categoría. Intente nuevamente."
+    - "No se puede eliminar una categoría que tiene platos asignados."
+    - "No se pudo eliminar la categoría. Intente nuevamente."
+
+  Admin/OrderController:
+    - "No se pudo actualizar el estado. Intente nuevamente."
+    - "No se pudo actualizar el estado de pago. Intente nuevamente."
+
+  OrderController (cliente):
+    - "No se pudo procesar el pedido. Intente nuevamente."
+
+¿Cómo se muestran los errores en pantalla?
+  Todos los métodos usan ->with('error', '...') y ->with('success', '...').
+  El layout principal (layouts/app.blade.php) tiene bloques @if(session('error'))
+  y @if(session('success')) que muestran el mensaje en un cuadro de alerta
+  al inicio de cada página.
+
+¿Las verificaciones previas son parte del try-catch?
+  No. Las verificaciones de integridad referencial (ej. "tiene platos asignados")
+  se ejecutan antes del try-catch para que el error sea claro y controlado.
+  El try-catch solo captura errores inesperados del sistema.
